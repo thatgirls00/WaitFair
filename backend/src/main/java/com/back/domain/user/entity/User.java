@@ -3,8 +3,6 @@ package com.back.domain.user.entity;
 import java.time.LocalDateTime;
 
 import com.back.global.entity.BaseEntity;
-import com.back.global.enums.UserActiveStatus;
-import com.back.global.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

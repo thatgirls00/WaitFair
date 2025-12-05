@@ -1,4 +1,4 @@
-package com.back.global.enums;
+package com.back.domain.user.entity;
 
 public enum UserRole {
 	USER,
