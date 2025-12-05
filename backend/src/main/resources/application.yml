@@ -1,4 +1,11 @@
 spring:
+  config:
+    import: optional:file:.env.properties
+  profiles:
+    active: local
+  output:
+    ansi:
+      enabled: always
   datasource:
     url: jdbc:postgresql://localhost:5432/waitfair
     username: ${DB_USER}
@@ -14,12 +21,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
   mvc:
     hiddenmethod:
       filter:
         enabled: true
-
 #  data:
 #    redis:
 #      host: localhost
