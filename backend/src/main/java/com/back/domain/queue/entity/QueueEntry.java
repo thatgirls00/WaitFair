@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="queue_entries")
+@Table(name = "queue_entries")
 public class QueueEntry extends BaseEntity {
 
 	// @Id
@@ -40,7 +40,7 @@ public class QueueEntry extends BaseEntity {
 
 	//TODO 유저, 이벤트 연관관계 추가 필요
 
-	public void enterQueue(){
+	public void enterQueue() {
 
 		this.queueEntryStatus = QueueEntryStatus.ENTERED;
 		this.enteredAt = LocalDateTime.now();
@@ -48,7 +48,7 @@ public class QueueEntry extends BaseEntity {
 
 	}
 
-	public void expire(){
+	public void expire() {
 		this.queueEntryStatus = QueueEntryStatus.EXPIRED;
 	}
 

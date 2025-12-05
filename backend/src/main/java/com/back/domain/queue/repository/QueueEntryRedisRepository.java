@@ -37,7 +37,7 @@ public class QueueEntryRedisRepository {
 		log.info("Removed user from waiting queue - eventId: {}, userId: {}", eventId, userId);
 	}
 
-	public Long getMyRankInWaitingQueue(Long eventId, Long userId){
+	public Long getMyRankInWaitingQueue(Long eventId, Long userId) {
 		String key = String.format(WAITING_KEY, eventId);
 		Long rank = redisTemplate.opsForZSet().rank(key, userId);
 		return rank != null ? rank + 1 : null; //0부터 시작하므로 +1
@@ -56,7 +56,7 @@ public class QueueEntryRedisRepository {
 		return size != null ? size : 0L;
 	}
 	
-	public Set<Object> getTopWaitingUsers(Long eventId, int count){
+	public Set<Object> getTopWaitingUsers(Long eventId, int count) {
 		String key = String.format(WAITING_KEY, eventId);
 		return redisTemplate.opsForZSet().range(key, 0, count-1);
 	}
@@ -104,7 +104,7 @@ public class QueueEntryRedisRepository {
 		return redisTemplate.opsForValue().increment(key);
 	}
 
-	public Long getEnteredCount(Long eventId){
+	public Long getEnteredCount(Long eventId) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
 		Object count = redisTemplate.opsForValue().get(key);
 		return count != null ? (Long) count : 0L;
