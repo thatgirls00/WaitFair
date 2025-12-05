@@ -44,6 +44,12 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
     implementation("org.postgresql:postgresql:42.7.8")
+
+    //redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    testImplementation("com.github.codemonstur:embedded-redis:1.4.3")
+
+    implementation ("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {
