@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
 			}
 		}
 
-		log.warn("MethodArgumentNotValidException {}", ex.getMessage());
+		log.error("MethodArgumentNotValidException {}", ex.getMessage());
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(JsonProcessingException.class)
 	public ResponseEntity<ApiResponse<?>> handleJsonProcessing(JsonProcessingException ex) {
 		ErrorCode code = CommonErrorCode.MESSAGE_NOT_READABLE;
-		log.warn("JSON parsing failed: {}", ex.getMessage(), ex);
+		log.error("JSON parsing failed: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ApiResponse<?>> handleConstraintViolation(ConstraintViolationException ex) {
 		ErrorCode code = CommonErrorCode.INVALID_INPUT_VALUE;
-		log.warn("Constraint violation: {}", ex.getMessage(), ex);
+		log.error("Constraint violation: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ApiResponse<?>> handleNotReadable(HttpMessageNotReadableException ex) {
 		ErrorCode code = CommonErrorCode.MESSAGE_NOT_READABLE;
-		log.warn("Message not readable: {}", ex.getMessage(), ex);
+		log.error("Message not readable: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -96,7 +96,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ApiResponse<?>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
 		ErrorCode code = CommonErrorCode.TYPE_MISMATCH;
-		log.warn("Type mismatch: {}", ex.getMessage(), ex);
+		log.error("Type mismatch: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -107,7 +107,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public ResponseEntity<ApiResponse<?>> handleMissingParam(MissingServletRequestParameterException ex) {
 		ErrorCode code = CommonErrorCode.MISSING_REQUEST_PARAMETER;
-		log.warn("Missing parameter: {}", ex.getMessage(), ex);
+		log.error("Missing parameter: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
@@ -118,7 +118,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<ApiResponse<?>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
 		ErrorCode code = CommonErrorCode.METHOD_NOT_ALLOWED;
-		log.warn("Method not supported: {}", ex.getMessage(), ex);
+		log.error("Method not supported: {}", ex.getMessage(), ex);
 
 		return ResponseEntity
 			.status(code.getHttpStatus())
