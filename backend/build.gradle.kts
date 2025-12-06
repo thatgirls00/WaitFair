@@ -30,8 +30,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("org.springframework.boot:spring-boot-starter-batch")
+    testImplementation("org.springframework.batch:spring-batch-test")
+
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
+
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
@@ -47,6 +52,12 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
     implementation("org.postgresql:postgresql:42.7.8")
+
+    //redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    testImplementation("com.github.codemonstur:embedded-redis:1.4.3")
+
+    implementation ("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {
