@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.back.api.seat.dto.SeatCreateRequest;
-import com.back.api.seat.dto.SeatUpdateRequest;
+import com.back.api.seat.dto.request.SeatCreateRequest;
+import com.back.api.seat.dto.request.SeatUpdateRequest;
 import com.back.domain.seat.entity.MockEvent;
 import com.back.domain.seat.entity.Seat;
 import com.back.domain.seat.repository.SeatRepository;

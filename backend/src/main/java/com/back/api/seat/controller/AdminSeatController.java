@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.back.api.seat.dto.BulkCreateSeatsRequest;
-import com.back.api.seat.dto.SeatCreateRequest;
-import com.back.api.seat.dto.SeatResponse;
-import com.back.api.seat.dto.SeatUpdateRequest;
+import com.back.api.seat.dto.request.BulkCreateSeatsRequest;
+import com.back.api.seat.dto.request.SeatCreateRequest;
+import com.back.api.seat.dto.request.SeatUpdateRequest;
+import com.back.api.seat.dto.response.SeatResponse;
 import com.back.api.seat.service.AdminSeatService;
 import com.back.api.seat.service.SeatService;
 import com.back.domain.seat.entity.Seat;
