@@ -26,20 +26,20 @@ public class QueueEntryRedisRepository {
 	public void addToWaitingQueue(Long eventId, Long userId, int rank) {
 
 		String key = String.format(WAITING_KEY, eventId);
-		redisTemplate.opsForZSet().add(key, userId, rank);
+		redisTemplate.opsForZSet().add(key, userId.toString(), rank);
 		log.info("Added user to waiting queue - eventId: {}, userId: {}, rank: {}", eventId, userId, rank);
 	}
 
 	// 대기열에서 제거
 	public void removeFromWaitingQueue(Long eventId, Long userId) {
 		String key = String.format(WAITING_KEY, eventId);
-		redisTemplate.opsForZSet().remove(key, userId);
+		redisTemplate.opsForZSet().remove(key, userId.toString());
 		log.info("Removed user from waiting queue - eventId: {}, userId: {}", eventId, userId);
 	}
 
 	public Long getMyRankInWaitingQueue(Long eventId, Long userId) {
 		String key = String.format(WAITING_KEY, eventId);
-		Long rank = redisTemplate.opsForZSet().rank(key, userId);
+		Long rank = redisTemplate.opsForZSet().rank(key, userId.toString());
 		return rank != null ? rank + 1 : null; //0부터 시작하므로 +1
 	}
 
@@ -63,7 +63,7 @@ public class QueueEntryRedisRepository {
 
 	public boolean isInWaitingQueue(Long eventId, Long userId) {
 		String key = String.format(WAITING_KEY, eventId);
-		Double score = redisTemplate.opsForZSet().score(key, userId);
+		Double score = redisTemplate.opsForZSet().score(key, userId.toString());
 		return score != null;
 	}
 
@@ -72,7 +72,7 @@ public class QueueEntryRedisRepository {
 	public void moveToEnteredQueue(Long eventId, Long userId) {
 		removeFromWaitingQueue(eventId, userId);
 		String key = String.format(ENTERED_KEY, eventId);
-		redisTemplate.opsForSet().add(key, userId);
+		redisTemplate.opsForSet().add(key, userId.toString());
 
 		redisTemplate.expire(key, java.time.Duration.ofMinutes(15));
 		log.info("Moved user to entered queue - eventId: {}, userId: {}", eventId, userId);
@@ -80,7 +80,7 @@ public class QueueEntryRedisRepository {
 
 	public void removeFromEnteredQueue(Long eventId, Long userId) {
 		String key = String.format(ENTERED_KEY, eventId);
-		redisTemplate.opsForSet().remove(key, userId);
+		redisTemplate.opsForSet().remove(key, userId.toString());
 		log.info("Removed user from entered queue - eventId: {}, userId: {}", eventId, userId);
 	}
 
@@ -92,7 +92,7 @@ public class QueueEntryRedisRepository {
 
 	public boolean isInEnteredQueue(Long eventId, Long userId) {
 		String key = String.format(ENTERED_KEY, eventId);
-		Boolean isMember = redisTemplate.opsForSet().isMember(key, userId);
+		Boolean isMember = redisTemplate.opsForSet().isMember(key, userId.toString());
 		return isMember != null && isMember;
 	}
 

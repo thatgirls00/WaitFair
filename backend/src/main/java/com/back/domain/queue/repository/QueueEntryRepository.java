@@ -1,5 +1,7 @@
 package com.back.domain.queue.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.back.domain.queue.entity.QueueEntry;
@@ -10,6 +12,8 @@ import com.back.domain.queue.entity.QueueEntry;
  * - Redis 장애 시 복구용
  */
 public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
+
+	Optional<QueueEntry> findByUserIdAndEventId(Long userId, Long eventId);
 
 
 }
