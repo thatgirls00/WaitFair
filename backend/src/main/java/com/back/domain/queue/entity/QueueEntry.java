@@ -25,17 +25,17 @@ public class QueueEntry extends BaseEntity {
 	// @GeneratedValue(strategy = GenerationType.SEQUENCE)
 	// private Long id;
 
-	@Column(nullable = false)
+	@Column(name="queue_rank", nullable = false)
 	private int queueRank;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(name = "queue_entry_status", nullable = false)
 	private QueueEntryStatus queueEntryStatus;
 
-	@Column(nullable = true)
+	@Column(name = "entered_at", nullable = true)
 	private LocalDateTime enteredAt;
 
-	@Column(nullable = true)
+	@Column(name = "expired_at", nullable = true)
 	private LocalDateTime expiredAt;
 
 	//TODO 실제 유저, 이벤트 연관관계 추가 필요
