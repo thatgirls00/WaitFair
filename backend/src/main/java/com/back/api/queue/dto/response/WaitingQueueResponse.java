@@ -4,9 +4,8 @@ import com.back.domain.queue.entity.QueueEntryStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-// 대기 중인 큐 엔트리 응답 DTO
 
-@Schema(description = "대기열 순서 대기 응답 DTO")
+@Schema(description = "대기 중 상태 응답 DTO")
 public record WaitingQueueResponse(
 
 	@Schema(description = "사용자 ID", example = "1")
@@ -15,7 +14,7 @@ public record WaitingQueueResponse(
 	@Schema(description = "이벤트 ID", example = "2")
 	Long eventId,
 
-	@Schema(description = "큐 엔트리 상태", example = "WAITING")
+	@Schema(description = "대기열 상태", example = "WAITING")
 	QueueEntryStatus status,
 
 	@Schema(description = "대기열 순위", example = "5", minimum = "1")
