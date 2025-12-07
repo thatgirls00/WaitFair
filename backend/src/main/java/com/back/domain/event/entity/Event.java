@@ -75,6 +75,7 @@ public class Event extends BaseEntity {
 		LocalDateTime preOpenAt, LocalDateTime preCloseAt,
 		LocalDateTime ticketOpenAt, LocalDateTime ticketCloseAt,
 		Integer maxTicketAmount, EventStatus status) {
+		validatePrice(minPrice, maxPrice);
 		this.title = title;
 		this.category = category;
 		this.description = description;
@@ -90,23 +91,37 @@ public class Event extends BaseEntity {
 		this.status = status != null ? status : EventStatus.READY;
 	}
 
-	public void update(String title, EventCategory category, String description, String place,
-		String imageUrl, Integer minPrice, Integer maxPrice,
-		LocalDateTime preOpenAt, LocalDateTime preCloseAt,
-		LocalDateTime ticketOpenAt, LocalDateTime ticketCloseAt,
-		Integer maxTicketAmount, EventStatus status) {
+	public void changeBasicInfo(String title, EventCategory category, String description, String place,
+		String imageUrl) {
 		this.title = title;
 		this.category = category;
 		this.description = description;
 		this.place = place;
 		this.imageUrl = imageUrl;
+	}
+
+	public void changePriceInfo(Integer minPrice, Integer maxPrice, Integer maxTicketAmount) {
+		validatePrice(minPrice, maxPrice);
 		this.minPrice = minPrice;
 		this.maxPrice = maxPrice;
+		this.maxTicketAmount = maxTicketAmount;
+	}
+
+	public void changePeriod(LocalDateTime preOpenAt, LocalDateTime preCloseAt,
+		LocalDateTime ticketOpenAt, LocalDateTime ticketCloseAt) {
 		this.preOpenAt = preOpenAt;
 		this.preCloseAt = preCloseAt;
 		this.ticketOpenAt = ticketOpenAt;
 		this.ticketCloseAt = ticketCloseAt;
-		this.maxTicketAmount = maxTicketAmount;
-		this.status = status;
+	}
+
+	public void changeStatus(EventStatus status) {
+		this.status = status != null ? status : this.status;
+	}
+
+	private void validatePrice(Integer minPrice, Integer maxPrice) {
+		if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+			throw new IllegalArgumentException("최소 가격은 최대 가격보다 클 수 없습니다.");
+		}
 	}
 }
