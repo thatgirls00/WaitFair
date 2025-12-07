@@ -3,7 +3,6 @@ package com.back.global.response;
 import org.springframework.http.HttpStatus;
 
 import com.back.global.error.code.ErrorCode;
-import com.back.global.error.exception.ErrorException;
 
 public record ApiResponse<T>(
 	HttpStatus status,
@@ -26,8 +25,7 @@ public record ApiResponse<T>(
 		return new ApiResponse<>(HttpStatus.NO_CONTENT, message, null);
 	}
 
-	public static ApiResponse<?> fail(ErrorException errorException) {
-		ErrorCode errorCode = errorException.getErrorCode();
+	public static ApiResponse<?> fail(ErrorCode errorCode) {
 		return new ApiResponse<>(
 			errorCode.getHttpStatus(),
 			errorCode.getMessage(),

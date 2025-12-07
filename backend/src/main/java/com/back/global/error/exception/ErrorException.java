@@ -18,4 +18,3 @@ public class ErrorException extends RuntimeException {
 		this.errorCode = errorCode;
 	}
 }
-

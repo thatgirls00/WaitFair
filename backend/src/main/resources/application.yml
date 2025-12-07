@@ -1,11 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/waitfair
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-
+  config:
+    import: optional:file:.env.properties
+  profiles:
+    active: local
+  output:
+    ansi:
+      enabled: always
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
@@ -14,16 +15,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
   mvc:
     hiddenmethod:
       filter:
         enabled: true
-
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 logging:
   level:
