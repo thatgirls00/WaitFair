@@ -20,6 +20,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Table(name = "queue_entries")
 public class QueueEntry extends BaseEntity {
 
@@ -59,8 +61,14 @@ public class QueueEntry extends BaseEntity {
 	@JoinColumn(name = "event_id", nullable = false)
 	private Event event;
 
-	public void enterQueue() {
+	public QueueEntry(User user, Event event, Integer queueRank) {
+		this.user = user;
+		this.event = event;
+		this.queueRank = queueRank;
+		this.queueEntryStatus = QueueEntryStatus.WAITING;
+	}
 
+	public void enterQueue() {
 		this.queueEntryStatus = QueueEntryStatus.ENTERED;
 		this.enteredAt = LocalDateTime.now();
 		this.expiredAt = this.enteredAt.plusMinutes(15); //시간 수정할 수도 있음

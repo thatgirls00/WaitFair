@@ -6,5 +6,7 @@ import com.back.domain.queue.entity.QueueEntry;
 
 public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
 
+	long countByEventId(Long eventId);
+
 
 }
