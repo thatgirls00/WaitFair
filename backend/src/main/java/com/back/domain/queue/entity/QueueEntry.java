@@ -87,4 +87,11 @@ public class QueueEntry extends BaseEntity {
 		return LocalDateTime.now().isAfter(this.expiredAt);
 	}
 
+	public Long getUserId() {
+		return user.getId();
+	}
+
+	public Long getEventId() {
+		return event.getId();
+	}
 }
