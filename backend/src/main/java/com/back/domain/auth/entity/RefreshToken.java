@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +32,7 @@ public class RefreshToken extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	private String tokenHash;
+	private String token;
 
 	@Column(name = "issued_at")
 	private LocalDateTime issuedAt;
@@ -44,4 +45,37 @@ public class RefreshToken extends BaseEntity {
 	private String userAgent;
 
 	private String ipAddress;
+
+	@Builder
+	private RefreshToken(
+		User user,
+		String token,
+		LocalDateTime issuedAt,
+		LocalDateTime expiresAt,
+		boolean revoked,
+		String userAgent,
+		String ipAddress
+	) {
+		this.user = user;
+		this.token = token;
+		this.issuedAt = issuedAt;
+		this.expiresAt = expiresAt;
+		this.revoked = revoked;
+		this.userAgent = userAgent;
+		this.ipAddress = ipAddress;
+	}
+
+	public void revoke() {
+		this.revoked = true;
+	}
+
+	public void updateRefreshToken(
+		String newToken,
+		LocalDateTime newIssuedAt,
+		LocalDateTime newExpiresAt
+	) {
+		this.token = newToken;
+		this.issuedAt = newIssuedAt;
+		this.expiresAt = newExpiresAt;
+	}
 }
