@@ -1,5 +1,6 @@
 package com.back.domain.event.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -33,4 +34,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 		Pageable pageable);
 
 	List<Event> findByStatus(EventStatus status);
+
+
+	List<Event> findByTicketOpenAtBetween(LocalDateTime start, LocalDateTime end);
 }
