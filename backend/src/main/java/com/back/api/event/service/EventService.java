@@ -71,7 +71,7 @@ public class EventService {
 	@Transactional
 	public void deleteEvent(Long eventId) {
 		Event event = findEventById(eventId);
-		eventRepository.delete(event);
+		event.delete();
 	}
 
 	public EventResponse getEvent(Long eventId) {
