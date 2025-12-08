@@ -1,5 +1,6 @@
 package com.back.domain.event.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,4 +46,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 	@Query("SELECT e FROM Event e WHERE e.status = :status AND e.deleted = false")
 	List<Event> findByStatus(@Param("status") EventStatus status);
+
+	@Query("SELECT e FROM Event e WHERE e.ticketOpenAt BETWEEN :start AND :end AND e.status = :status AND e.deleted = false")
+	List<Event> findByTicketOpenAtBetweenAndStatus(
+		@Param("start") LocalDateTime start,
+		@Param("end") LocalDateTime end,
+		@Param("status") EventStatus status
+	);
+
+	@Query("SELECT e FROM Event e WHERE e.status IN :statuses AND e.deleted = false")
+	List<Event> findByStatusIn(@Param("statuses") List<EventStatus> statuses);
 }
