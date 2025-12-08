@@ -16,7 +16,6 @@ import lombok.Setter;
 
 @MappedSuperclass
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
