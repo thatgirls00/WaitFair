@@ -1,5 +1,6 @@
 package com.back.global.http;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import com.back.global.error.code.AuthErrorCode;
 import com.back.global.error.exception.ErrorException;
 import com.back.global.security.SecurityUser;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,13 @@ public class HttpRequestContext {
 			.orElseThrow(() -> new ErrorException(AuthErrorCode.UNAUTHORIZED));
 	}
 
+	public String getHeader(String name, String defaultValue) {
+		return Optional
+			.ofNullable(request.getHeader(name))
+			.filter(value -> !value.isBlank())
+			.orElse(defaultValue);
+	}
+
 	public String getUserAgent() {
 		String userAgent = request.getHeader("User-Agent");
 		return userAgent != null ? userAgent : "unknown";
@@ -72,5 +81,18 @@ public class HttpRequestContext {
 		}
 
 		return request.getRemoteAddr();
+	}
+
+	public String getCookieValue(String name, String defaultValue) {
+		return Optional
+			.ofNullable(request.getCookies())
+			.flatMap(
+				cookies -> Arrays.stream(cookies)
+					.filter(cookie -> cookie.getName().equals(name))
+					.map(Cookie::getValue)
+					.filter(value -> !value.isBlank())
+					.findFirst()
+			)
+			.orElse(defaultValue);
 	}
 }

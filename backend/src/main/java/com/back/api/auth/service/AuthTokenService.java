@@ -1,6 +1,7 @@
 package com.back.api.auth.service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -56,5 +57,9 @@ public class AuthTokenService {
 			nowEpochMillis + refreshValidityMillis,
 			refreshValidityMillis
 		);
+	}
+
+	public Map<String, Object> payloadOrNull(String accessToken) {
+		return jwtProvider.payloadOrNull(accessToken);
 	}
 }

@@ -1,7 +1,5 @@
 package com.back.global.config;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,9 +10,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.back.global.properties.CorsProperties;
+import com.back.global.security.CustomAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final CustomAuthenticationFilter customAuthenticationFilter;
+	private final CorsProperties corsProperties;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -39,15 +46,15 @@ public class SecurityConfig {
 
 		return http.build();
 
-		// TODO: 나중에 인증 규칙 추가
+		// TODO: 나중에 인증 규칙 추가, 로그인 구현 때 추가 예정
 	}
 
 	@Bean
 	public UrlBasedCorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080"));
-		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-		config.setAllowedHeaders(List.of("*"));
+		config.setAllowedOrigins(corsProperties.getAllowedOrigins());
+		config.setAllowedMethods(corsProperties.getAllowedMethods());
+		config.setAllowedHeaders(corsProperties.getAllowedHeaders());
 		config.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.back.domain.user.entity.User;
+import com.back.domain.user.entity.UserRole;
 import com.back.global.utils.JwtUtil;
 
 import lombok.Getter;
@@ -57,5 +58,26 @@ public class JwtProvider {
 	/** refresh token 만료 시각 (epoch milli) */
 	public long getRefreshTokenExpiresAtMillis() {
 		return System.currentTimeMillis() + refreshTokenDurationMillis;
+	}
+
+	public Map<String, Object> payloadOrNull(String jwt) {
+		Map<String, Object> payload = JwtUtil.payloadOrNull(jwt, secret);
+
+		if (payload == null) {
+			return null;
+		}
+
+		Number idNo = (Number)payload.get("id");
+		long id = idNo.longValue();
+
+		String nickname = (String)payload.get("nickname");
+
+		UserRole role = (UserRole)payload.get("role");
+
+		return Map.of("id", id, "nickname", nickname, "role", role);
+	}
+
+	public boolean isExpired(String jwt) {
+		return JwtUtil.isExpired(jwt, secret);
 	}
 }

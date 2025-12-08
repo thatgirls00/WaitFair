@@ -40,6 +40,18 @@ springdoc:
   default-consumes-media-type: application/json
 
 custom:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:8080
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed-headers:
+      - "*"
+  
   jwt:
     secret: ${JWT_SECRET}
     access-token-duration: ${JWT_ACCESS_TOKEN_DURATION:3600}
