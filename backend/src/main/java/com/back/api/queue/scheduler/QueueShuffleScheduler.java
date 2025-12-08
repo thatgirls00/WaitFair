@@ -11,6 +11,7 @@ import com.back.domain.event.entity.Event;
 import com.back.domain.event.entity.EventStatus;
 import com.back.domain.event.repository.EventRepository;
 import com.back.domain.queue.repository.QueueEntryRepository;
+import com.back.global.properties.QueueSchedulerProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +29,18 @@ public class QueueShuffleScheduler {
 	private final QueueEntryRepository queueEntryRepository;
 	private final EventRepository eventRepository; //TODO service로 변경 필요
 	private final QueueShuffleService queueShuffleService;
+	private final QueueSchedulerProperties properties;
 
-	@Scheduled(cron = "0 */10 * * * *",  zone = "Asia/Seoul") //10분마다 실행
+	@Scheduled(cron = "${queue.scheduler.shuffle.cron}",  zone = "Asia/Seoul") //10분마다 실행
 	public void autoShuffleQueue() {
 		try {
 			LocalDateTime now = LocalDateTime.now();
 
+			int timeRangeMinutes = properties.getShuffle().getTimeRangeMinutes();
+
 			LocalDateTime targetTime = now.plusHours(1);
-			LocalDateTime rangeStart = targetTime.minusMinutes(10);
-			LocalDateTime rangeEnd = targetTime.plusMinutes(10);
+			LocalDateTime rangeStart = targetTime.minusMinutes(timeRangeMinutes);
+			LocalDateTime rangeEnd = targetTime.plusMinutes(timeRangeMinutes);
 
 			List<Event> eventList = eventRepository.findByTicketOpenAtBetweenAndStatus(
 				rangeStart,
