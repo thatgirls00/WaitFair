@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,7 +20,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "refreshTokens")
+@Table(
+	name = "refreshTokens",
+	indexes = {
+		@Index(name = "idx_refresh_token_token", columnList = "token"),
+		@Index(name = "idx_refresh_token_user_revoked", columnList = "user_id, revoked"),
+		@Index(name = "idx_refresh_token_user_expires_at", columnList = "user_id, expires_at")
+	}
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken extends BaseEntity {
