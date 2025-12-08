@@ -67,5 +67,5 @@ custom:
     front-url: "https://www.${custom.prod.domain}"
   site:
     domain: "${custom.dev.domain}"
-    back-url: "${custom.dev.backUrl}"
-    front-url: "${custom.dev.frontUrl}"
+    back-url: "${custom.dev.back-url}"
+    front-url: "${custom.dev.front-url}"
