@@ -50,16 +50,6 @@ public class JwtProvider {
 		return refreshTokenDurationMillis;
 	}
 
-	/** access token 만료 시각 (epoch milli) */
-	public long getAccessTokenExpiresAtMillis() {
-		return System.currentTimeMillis() + accessTokenDurationMillis;
-	}
-
-	/** refresh token 만료 시각 (epoch milli) */
-	public long getRefreshTokenExpiresAtMillis() {
-		return System.currentTimeMillis() + refreshTokenDurationMillis;
-	}
-
 	public Map<String, Object> payloadOrNull(String jwt) {
 		Map<String, Object> payload = JwtUtil.payloadOrNull(jwt, secret);
 
