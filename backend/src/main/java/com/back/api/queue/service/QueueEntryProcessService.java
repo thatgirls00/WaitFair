@@ -50,7 +50,7 @@ public class QueueEntryProcessService {
 		int successCount = 0;
 		int failCount = 0;
 
-		for(Long userId : userIds) {
+		for (Long userId : userIds) {
 			try {
 				processEntry(eventId, userId);
 				successCount++;
@@ -65,28 +65,28 @@ public class QueueEntryProcessService {
 		QueueEntryStatus status = queueEntry.getQueueEntryStatus();
 
 		//이미 입장한 경우
-		if(status == QueueEntryStatus.ENTERED) {
+		if (status == QueueEntryStatus.ENTERED) {
 			throw new ErrorException(QueueEntryErrorCode.ALREADY_ENTERED);
 		}
 
 		//이미 만료된 경우
-		if(status == QueueEntryStatus.EXPIRED) {
+		if (status == QueueEntryStatus.EXPIRED) {
 			throw new ErrorException(QueueEntryErrorCode.ALREADY_EXPIRED);
 		}
 
 		//대기중 상태가 아닌 경우
-		if(status != QueueEntryStatus.WAITING) {
+		if (status != QueueEntryStatus.WAITING) {
 			throw new ErrorException(QueueEntryErrorCode.NOT_WAITING_STATUS);
 		}
 	}
 
 	private void updateRedis(Long eventId, Long userId) {
-		try{
+		try {
 			queueEntryRedisRepository.moveToEnteredQueue(eventId, userId);
 			queueEntryRedisRepository.incrementEnteredCount(eventId);
 			log.debug("Success to update eventId {} to Redis", eventId);
 
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Failed to update eventId {} to Redis", eventId);
 		}
 	}
@@ -103,12 +103,12 @@ public class QueueEntryProcessService {
 		QueueEntry queueEntry = queueEntryRepository.findByEvent_IdAndUser_Id(eventId, userId)
 			.orElseThrow(() -> new ErrorException(QueueEntryErrorCode.NOT_FOUND_QUEUE_ENTRY));
 
-		if(queueEntry.getQueueEntryStatus() == QueueEntryStatus.EXPIRED){
+		if (queueEntry.getQueueEntryStatus() == QueueEntryStatus.EXPIRED) {
 			log.debug("Already expired queue entry cannot be expired again.");
 			return;
 		}
 
-		if(queueEntry.getQueueEntryStatus() != QueueEntryStatus.ENTERED){
+		if (queueEntry.getQueueEntryStatus() != QueueEntryStatus.ENTERED) {
 			log.debug("Only entered queue entry can be expired.");
 			return;
 		}
@@ -116,10 +116,10 @@ public class QueueEntryProcessService {
 		queueEntry.expire();
 		queueEntryRepository.save(queueEntry);
 
-		try{
+		try {
 			queueEntryRedisRepository.removeFromEnteredQueue(eventId, userId);
 			log.debug("Success to Expire eventId {} to Redis", eventId);
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Failed to Expire eventId {} to Redis", eventId);
 		}
 
@@ -131,7 +131,7 @@ public class QueueEntryProcessService {
 
 		int successCount = 0;
 
-		for(QueueEntry entry : entries) {
+		for (QueueEntry entry : entries) {
 			expireEntry(entry.getEventId(), entry.getUserId());
 			successCount++;
 		}

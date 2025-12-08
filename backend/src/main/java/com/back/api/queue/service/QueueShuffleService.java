@@ -49,7 +49,7 @@ public class QueueShuffleService {
 		List<Long> shuffledUserIds = shuffleUserIds(preRegisteredUserIds);
 		List<User> users = userRepository.findAllById(preRegisteredUserIds);
 
-		if(users.size() != shuffledUserIds.size()){
+		if (users.size() != shuffledUserIds.size()) {
 			throw new ErrorException(QueueEntryErrorCode.INVALID_PREREGISTER_LIST);
 		}
 
@@ -60,15 +60,15 @@ public class QueueShuffleService {
 
 	}
 
-	private void validateShuffleRequest(Long eventId, List<Long> preRegisteredUserIds){
+	private void validateShuffleRequest(Long eventId, List<Long> preRegisteredUserIds) {
 
-		if(preRegisteredUserIds == null || preRegisteredUserIds.isEmpty()){
+		if (preRegisteredUserIds == null || preRegisteredUserIds.isEmpty()) {
 			throw new ErrorException(QueueEntryErrorCode.PRE_REGISTERED_USERS_EMPTY);
 		}
 
 		// 대기열 중복 확인
 		long registeredCount = queueEntryRepository.countByEvent_Id(eventId);
-		if(registeredCount > 0){
+		if (registeredCount > 0) {
 			throw new ErrorException(QueueEntryErrorCode.QUEUE_ALREADY_EXISTS);
 		}
 	}
@@ -78,8 +78,8 @@ public class QueueShuffleService {
 		List<Long> shuffledList = new ArrayList<>(userIds);
 		SecureRandom secureRandom = new SecureRandom();
 
-		for(int i = shuffledList.size() - 1; i > 0; i--) {
-			int j = secureRandom.nextInt(i+1); //0~i 사이 랜덤 인덱스
+		for (int i = shuffledList.size() - 1; i > 0; i--) {
+			int j = secureRandom.nextInt(i + 1); //0~i 사이 랜덤 인덱스
 			Long tmp = shuffledList.get(i);
 			shuffledList.set(i, shuffledList.get(j));
 			shuffledList.set(j, tmp);
@@ -90,14 +90,14 @@ public class QueueShuffleService {
 
 
 	private void saveToRedis(Long eventId, List<Long> shuffledUserIds) {
-		try{
-			for(int i=0; i<shuffledUserIds.size(); i++){
+		try {
+			for (int i = 0; i < shuffledUserIds.size(); i++) {
 				Long userId = shuffledUserIds.get(i);
-				int rank = i+1;
+				int rank = i + 1;
 				queueEntryRedisRepository.addToWaitingQueue(eventId, userId, rank);
 			}
 			log.debug("Success to save eventId {} to Redis", eventId);
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Failed to save eventId {} to Redis", eventId);
 			throw new ErrorException(QueueEntryErrorCode.REDIS_CONNECTION_FAILED);
 		}
@@ -111,8 +111,8 @@ public class QueueShuffleService {
 
 		List<QueueEntry> entries = new ArrayList<>();
 
-		for(int i=0; i<shuffledUserIds.size(); i++){
-			int rank = i+1;
+		for (int i = 0; i < shuffledUserIds.size(); i++) {
+			int rank = i + 1;
 			Long userId = shuffledUserIds.get(i);
 			User user = userMap.get(userId);
 

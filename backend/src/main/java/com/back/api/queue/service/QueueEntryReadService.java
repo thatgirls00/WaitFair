@@ -29,11 +29,11 @@ public class QueueEntryReadService {
 	private final QueueEntryRepository queueEntryRepository;
 	private final QueueEntryRedisRepository queueEntryRedisRepository;
 
-	public QueueEntryStatusResponse getMyQueueStatus(Long eventId, Long userId){
+	public QueueEntryStatusResponse getMyQueueStatus(Long eventId, Long userId) {
 		QueueEntry entry = queueEntryRepository.findByEvent_IdAndUser_Id(eventId, userId)
 			.orElseThrow(()-> new ErrorException(QueueEntryErrorCode.NOT_FOUND_QUEUE_ENTRY));
 
-		return switch(entry.getQueueEntryStatus()){
+		return switch(entry.getQueueEntryStatus()) {
 			case WAITING -> buildWaitingQueueResponse(eventId, entry);
 			case ENTERED  -> buildEnteredQueueResponse(entry);
 			case EXPIRED  -> buildExpiredQueueResponse(entry);
@@ -41,13 +41,13 @@ public class QueueEntryReadService {
 	}
 
 	//Redis 기반
-	private WaitingQueueResponse buildWaitingQueueResponse(Long eventId, QueueEntry entry){
+	private WaitingQueueResponse buildWaitingQueueResponse(Long eventId, QueueEntry entry) {
 		Long currentRank = queueEntryRedisRepository.getMyRankInWaitingQueue(eventId, entry.getUserId());
 		Long waitingAheadCount = queueEntryRedisRepository.getWaitingAheadCount(eventId, entry.getUserId());
 		Long totalWaitingCount = queueEntryRedisRepository.getTotalWaitingCount(eventId);
 
 		//Redis에 데이터가 없으면 DB 기반 응답 생성
-		if(currentRank == null){
+		if (currentRank == null) {
 			return buildWaitingQueueResponseFromDB(eventId, entry);
 		}
 
@@ -70,8 +70,9 @@ public class QueueEntryReadService {
 	}
 
 	//DB 기반
-	private WaitingQueueResponse buildWaitingQueueResponseFromDB(Long eventId, QueueEntry entry){
-		long waitingAheadCount = queueEntryRepository.countByEvent_IdAndQueueRankLessThan(eventId, entry.getQueueRank());
+	private WaitingQueueResponse buildWaitingQueueResponseFromDB(Long eventId, QueueEntry entry) {
+		long waitingAheadCount = queueEntryRepository
+			.countByEvent_IdAndQueueRankLessThan(eventId, entry.getQueueRank());
 		long totalWaitingCount = queueEntryRepository.countByEvent_IdAndQueueEntryStatus(
 			eventId, QueueEntryStatus.WAITING
 		);
@@ -92,7 +93,7 @@ public class QueueEntryReadService {
 		);
 	}
 
-	private EnteredQueueResponse buildEnteredQueueResponse(QueueEntry entry){
+	private EnteredQueueResponse buildEnteredQueueResponse(QueueEntry entry) {
 		return EnteredQueueResponse.from(
 			entry.getUserId(),
 			entry.getEventId(),
@@ -101,7 +102,7 @@ public class QueueEntryReadService {
 		);
 	}
 
-	private ExpiredQueueResponse buildExpiredQueueResponse(QueueEntry entry){
+	private ExpiredQueueResponse buildExpiredQueueResponse(QueueEntry entry) {
 		return ExpiredQueueResponse.from(
 			entry.getUserId(),
 			entry.getEventId()
