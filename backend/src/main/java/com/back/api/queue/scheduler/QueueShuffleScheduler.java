@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.back.api.queue.service.QueueShuffleService;
 import com.back.domain.event.entity.Event;
+import com.back.domain.event.entity.EventStatus;
 import com.back.domain.event.repository.EventRepository;
 import com.back.domain.queue.repository.QueueEntryRepository;
 
@@ -37,7 +38,11 @@ public class QueueShuffleScheduler {
 			LocalDateTime rangeStart = targetTime.minusMinutes(10);
 			LocalDateTime rangeEnd = targetTime.plusMinutes(10);
 
-			List<Event> eventList = eventRepository.findByTicketOpenAtBetween(rangeStart, rangeEnd);
+			List<Event> eventList = eventRepository.findByTicketOpenAtBetweenAndStatus(
+				rangeStart,
+				rangeEnd,
+				EventStatus.PRE_OPEN
+			);
 
 			if (eventList.isEmpty()) {
 				log.info("No events found for auto shuffle");
@@ -47,7 +52,7 @@ public class QueueShuffleScheduler {
 			log.info("Found {} events for auto shuffle", eventList.size());
 
 			for (Event event : eventList) {
-				autoShuffleEvent(event);
+				shuffleQueueForEvent(event);
 			}
 
 		} catch (Exception e) {
@@ -55,7 +60,8 @@ public class QueueShuffleScheduler {
 		}
 	}
 
-	private void autoShuffleEvent(Event event) {
+	//특정 이벤트 셔플 처리
+	private void shuffleQueueForEvent(Event event) {
 		Long eventId = event.getId();
 
 		long existingCount = queueEntryRepository.countByEvent_Id(eventId);

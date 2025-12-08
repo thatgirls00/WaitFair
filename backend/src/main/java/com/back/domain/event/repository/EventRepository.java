@@ -36,5 +36,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	List<Event> findByStatus(EventStatus status);
 
 
-	List<Event> findByTicketOpenAtBetween(LocalDateTime start, LocalDateTime end);
+	List<Event> findByTicketOpenAtBetweenAndStatus(
+		LocalDateTime start,
+		LocalDateTime end,
+		EventStatus status
+	);
+
+	List<Event> findByStatusIn(List<EventStatus> statuses);
 }
