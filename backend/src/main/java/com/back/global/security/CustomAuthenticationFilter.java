@@ -59,17 +59,10 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 	) throws ServletException, IOException {
 		String requestUrl = request.getRequestURI();
 
-		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		if (!requestUrl.startsWith("/api/")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		if (requestUrl.startsWith(AUTH_PATH_PREFIX)) {
+		if ("OPTIONS".equalsIgnoreCase(request.getMethod())
+			|| !requestUrl.startsWith("/api/")
+			|| requestUrl.startsWith(AUTH_PATH_PREFIX)
+		) {
 			filterChain.doFilter(request, response);
 			return;
 		}
@@ -81,6 +74,12 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			accessToken = headerAuthorization.substring(BEARER_PREFIX.length());
 		} else {
 			accessToken = requestContext.getCookieValue("accessToken", "");
+		}
+
+		// TODO: 초기에 인증없이 모든 API 사용 가능하도록 설정, 기능 개발 완료 후 제거
+		if (accessToken == null || accessToken.isBlank()) {
+			filterChain.doFilter(request, response);
+			return;
 		}
 
 		if (jwtProvider.isExpired(accessToken)) {
