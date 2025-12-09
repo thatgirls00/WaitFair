@@ -55,7 +55,7 @@ class EventControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		// 날짜 설정 (나노초 절삭)
+		// 날짜 설정
 		now = LocalDateTime.now().withNano(0);
 		preOpenAt = now.plusDays(1);
 		preCloseAt = now.plusDays(5);
@@ -95,7 +95,7 @@ class EventControllerTest {
 				.andExpect(jsonPath("$.message").value("이벤트가 생성되었습니다."))
 				.andExpect(jsonPath("$.data.title").value("테스트 이벤트"));
 
-			// then: 실제 DB 저장 검증
+			// then
 			List<Event> events = eventRepository.findAll();
 			assertThat(events).hasSize(1);
 
@@ -316,3 +316,4 @@ class EventControllerTest {
 		}
 	}
 }
+
