@@ -55,7 +55,7 @@ public class QueueEntryRedisRepository {
 		Long size = redisTemplate.opsForZSet().size(key);
 		return size != null ? size : 0L;
 	}
-	
+
 	public Set<Object> getTopWaitingUsers(Long eventId, int count) {
 		String key = String.format(WAITING_KEY, eventId);
 		return redisTemplate.opsForZSet().range(key, 0, count - 1);
@@ -96,8 +96,6 @@ public class QueueEntryRedisRepository {
 		return isMember != null && isMember;
 	}
 
-
-
 	/* ==================== 카운터 관련 메서드 ==================== */
 	public Long incrementEnteredCount(Long eventId) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
@@ -107,7 +105,7 @@ public class QueueEntryRedisRepository {
 	public Long getEnteredCount(Long eventId) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
 		Object count = redisTemplate.opsForValue().get(key);
-		return count != null ? (Long) count : 0L;
+		return count != null ? (Long)count : 0L;
 	}
 
 	/**

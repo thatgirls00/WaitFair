@@ -59,11 +59,11 @@ class AdminSeatControllerTest {
 		void bulkCreateSeats_Success() throws Exception {
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000},
-				    {"seatCode": "A2", "grade": "VIP", "price": 150000},
-				    {"seatCode": "B1", "grade": "R", "price": 100000}
-				  ]
+					"seats": [
+					{"seatCode": "A1", "grade": "VIP", "price": 150000},
+					{"seatCode": "A2", "grade": "VIP", "price": 150000},
+					{"seatCode": "B1", "grade": "R", "price": 100000}
+					]
 				}
 				""";
 
@@ -87,7 +87,7 @@ class AdminSeatControllerTest {
 		void bulkCreateSeats_EmptyList() throws Exception {
 			String requestBody = """
 				{
-				  "seats": []
+					"seats": []
 				}
 				""";
 
@@ -103,10 +103,10 @@ class AdminSeatControllerTest {
 		void bulkCreateSeats_InternalDuplicate() throws Exception {
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000},
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000},
+						{"seatCode": "A1", "grade": "VIP", "price": 150000}
+					]
 				}
 				""";
 
@@ -125,10 +125,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000},
-				    {"seatCode": "A2", "grade": "VIP", "price": 150000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000},
+						{"seatCode": "A2", "grade": "VIP", "price": 150000}
+					]
 				}
 				""";
 
@@ -145,10 +145,10 @@ class AdminSeatControllerTest {
 		void bulkCreateSeats_SameSeatCodeDifferentGrade() throws Exception {
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000},
-				    {"seatCode": "A1", "grade": "R", "price": 100000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000},
+						{"seatCode": "A1", "grade": "R", "price": 100000}
+					]
 				}
 				""";
 
@@ -165,9 +165,9 @@ class AdminSeatControllerTest {
 		void bulkCreateSeats_EventNotFound() throws Exception {
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000}
+					]
 				}
 				""";
 
@@ -188,10 +188,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_Success() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 3,
-				  "cols": 5,
-				  "defaultGrade": "R",
-				  "defaultPrice": 100000
+					"rows": 3,
+					"cols": 5,
+					"defaultGrade": "R",
+					"defaultPrice": 100000
 				}
 				""";
 
@@ -215,10 +215,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_RowsExceedsLimit() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 27,
-				  "cols": 5,
-				  "defaultGrade": "R",
-				  "defaultPrice": 100000
+					"rows": 27,
+					"cols": 5,
+					"defaultGrade": "R",
+					"defaultPrice": 100000
 				}
 				""";
 
@@ -234,10 +234,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_ColsExceedsLimit() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 5,
-				  "cols": 101,
-				  "defaultGrade": "R",
-				  "defaultPrice": 100000
+					"rows": 5,
+					"cols": 101,
+					"defaultGrade": "R",
+					"defaultPrice": 100000
 				}
 				""";
 
@@ -253,10 +253,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_NullFields() throws Exception {
 			String requestBody = """
 				{
-				  "rows": null,
-				  "cols": null,
-				  "defaultGrade": null,
-				  "defaultPrice": null
+					"rows": null,
+					"cols": null,
+					"defaultGrade": null,
+					"defaultPrice": null
 				}
 				""";
 
@@ -272,10 +272,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_NegativePrice() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 2,
-				  "cols": 3,
-				  "defaultGrade": "R",
-				  "defaultPrice": -1000
+					"rows": 2,
+					"cols": 3,
+					"defaultGrade": "R",
+					"defaultPrice": -1000
 				}
 				""";
 
@@ -293,10 +293,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "rows": 2,
-				  "cols": 2,
-				  "defaultGrade": "R",
-				  "defaultPrice": 100000
+					"rows": 2,
+					"cols": 2,
+					"defaultGrade": "R",
+					"defaultPrice": 100000
 				}
 				""";
 
@@ -318,9 +318,9 @@ class AdminSeatControllerTest {
 		void createSingleSeat_Success() throws Exception {
 			String requestBody = """
 				{
-				  "seatCode": "VIP1",
-				  "grade": "VIP",
-				  "price": 200000
+					"seatCode": "VIP1",
+					"grade": "VIP",
+					"price": 200000
 				}
 				""";
 
@@ -343,9 +343,9 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "VIP1",
-				  "grade": "VIP",
-				  "price": 200000
+					"seatCode": "VIP1",
+					"grade": "VIP",
+					"price": 200000
 				}
 				""";
 
@@ -369,10 +369,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A2",
-				  "grade": "VIP",
-				  "price": 150000,
-				  "seatStatus": "AVAILABLE"
+					"seatCode": "A2",
+					"grade": "VIP",
+					"price": 150000,
+					"seatStatus": "AVAILABLE"
 				}
 				""";
 
@@ -394,10 +394,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A1",
-				  "grade": "R",
-				  "price": 120000,
-				  "seatStatus": "SOLD"
+					"seatCode": "A1",
+					"grade": "R",
+					"price": 120000,
+					"seatStatus": "SOLD"
 				}
 				""";
 
@@ -418,10 +418,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A1",
-				  "grade": "VIP",
-				  "price": 100000,
-				  "seatStatus": "AVAILABLE"
+					"seatCode": "A1",
+					"grade": "VIP",
+					"price": 100000,
+					"seatStatus": "AVAILABLE"
 				}
 				""";
 
@@ -438,10 +438,10 @@ class AdminSeatControllerTest {
 		void updateSeat_NotFound() throws Exception {
 			String requestBody = """
 				{
-				  "seatCode": "A1",
-				  "grade": "VIP",
-				  "price": 150000,
-				  "seatStatus": "AVAILABLE"
+					"seatCode": "A1",
+					"grade": "VIP",
+					"price": 150000,
+					"seatStatus": "AVAILABLE"
 				}
 				""";
 
@@ -515,12 +515,12 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000},
-				    {"seatCode": "A2", "grade": "VIP", "price": 150000},
-				    {"seatCode": "B1", "grade": "R", "price": 100000},
-				    {"seatCode": "B2", "grade": "R", "price": 100000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000},
+						{"seatCode": "A2", "grade": "VIP", "price": 150000},
+						{"seatCode": "B1", "grade": "R", "price": 100000},
+						{"seatCode": "B2", "grade": "R", "price": 100000}
+					]
 				}
 				""";
 
@@ -539,10 +539,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A2",
-				  "grade": "VIP",
-				  "price": 150000,
-				  "seatStatus": "AVAILABLE"
+					"seatCode": "A2",
+					"grade": "VIP",
+					"price": 150000,
+					"seatStatus": "AVAILABLE"
 				}
 				""";
 
@@ -561,9 +561,9 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seats": [
-				    {"seatCode": "A1", "grade": "VIP", "price": 150000}
-				  ]
+					"seats": [
+						{"seatCode": "A1", "grade": "VIP", "price": 150000}
+					]
 				}
 				""";
 
@@ -584,10 +584,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_MaxRows() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 26,
-				  "cols": 1,
-				  "defaultGrade": "A",
-				  "defaultPrice": 50000
+					"rows": 26,
+					"cols": 1,
+					"defaultGrade": "A",
+					"defaultPrice": 50000
 				}
 				""";
 
@@ -606,10 +606,10 @@ class AdminSeatControllerTest {
 		void autoCreateSeats_MaxCols() throws Exception {
 			String requestBody = """
 				{
-				  "rows": 1,
-				  "cols": 100,
-				  "defaultGrade": "A",
-				  "defaultPrice": 50000
+					"rows": 1,
+					"cols": 100,
+					"defaultGrade": "A",
+					"defaultPrice": 50000
 				}
 				""";
 
@@ -627,9 +627,9 @@ class AdminSeatControllerTest {
 		void createSeat_ZeroPrice() throws Exception {
 			String requestBody = """
 				{
-				  "seatCode": "FREE1",
-				  "grade": "A",
-				  "price": 0
+					"seatCode": "FREE1",
+					"grade": "A",
+					"price": 0
 				}
 				""";
 
@@ -648,10 +648,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A1",
-				  "grade": "R",
-				  "price": 100000,
-				  "seatStatus": "SOLD"
+					"seatCode": "A1",
+					"grade": "R",
+					"price": 100000,
+					"seatStatus": "SOLD"
 				}
 				""";
 
@@ -670,10 +670,10 @@ class AdminSeatControllerTest {
 
 			String requestBody = """
 				{
-				  "seatCode": "A1",
-				  "grade": "R",
-				  "price": 100000,
-				  "seatStatus": "RESERVED"
+					"seatCode": "A1",
+					"grade": "R",
+					"price": 100000,
+					"seatStatus": "RESERVED"
 				}
 				""";
 
