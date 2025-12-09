@@ -51,4 +51,6 @@ public class QueueEntryController {
 		return ApiResponse.ok("대기열 진입 여부를 확인했습니다.", exists);
 	}
 
+	//TODO 내 순번 조회
+
 }

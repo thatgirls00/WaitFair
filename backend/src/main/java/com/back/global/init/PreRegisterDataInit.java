@@ -61,7 +61,7 @@ public class PreRegisterDataInit implements ApplicationRunner {
 		// 	return;
 		// }
 
-		List<PreRegister> preRegisters = createTestPreRegisters(event, users, 100);
+		List<PreRegister> preRegisters = createTestPreRegisters(event, users, 150);
 
 	}
 

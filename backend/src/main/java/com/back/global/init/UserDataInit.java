@@ -36,7 +36,7 @@ public class UserDataInit implements ApplicationRunner {
 
 		log.info("User 초기 데이터를 생성합니다.");
 
-		List<User> users = createTestUsers(100);
+		List<User> users = createTestUsers(150);
 
 		log.info("User 초기 데이터 {}명이 생성되었습니다.", users.size());
 	}
