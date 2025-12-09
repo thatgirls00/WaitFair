@@ -68,9 +68,6 @@ class SeatControllerTest {
 		testEventListener.clear();
 	}
 
-	// =====================================================================
-	// 1. 좌석 목록 조회
-	// =====================================================================
 	@Nested
 	@DisplayName("좌석 목록 조회 API (/api/v1/events/{eventId}/seats)")
 	class GetSeatsByEventTests {
@@ -110,9 +107,6 @@ class SeatControllerTest {
 		}
 	}
 
-	// =====================================================================
-	// 2. 좌석 선택 (AVAILABLE → RESERVED)
-	// =====================================================================
 	@Nested
 	@DisplayName("좌석 선택 API (/api/v1/events/{eventId}/seats/{seatId}/select)")
 	class SelectSeatTests {
@@ -177,9 +171,6 @@ class SeatControllerTest {
 		}
 	}
 
-	// =====================================================================
-	// 3. 좌석 상태 전이 검증 (DB 기준)
-	// =====================================================================
 	@Nested
 	@DisplayName("좌석 상태 전이 검증")
 	class SeatStatusTransitionTests {
@@ -237,9 +228,6 @@ class SeatControllerTest {
 		}
 	}
 
-	// =====================================================================
-	// 4. WebSocket / STOMP 이벤트 검증
-	// =====================================================================
 	@Nested
 	@DisplayName("좌석 선택 시 WebSocket용 SeatStatusMessage 이벤트 발행")
 	class WebSocketEventTests {

@@ -1,4 +1,4 @@
-package com.back.api.seat.Service;
+package com.back.api.seat.service;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.back.api.seat.service.SeatService;
 import com.back.config.TestRedisConfig;
 import com.back.domain.event.entity.Event;
 import com.back.domain.event.repository.EventRepository;

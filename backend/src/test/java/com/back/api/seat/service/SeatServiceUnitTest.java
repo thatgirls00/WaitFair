@@ -1,4 +1,4 @@
-package com.back.api.seat.Service;
+package com.back.api.seat.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import com.back.api.seat.dto.response.SeatStatusMessage;
-import com.back.api.seat.service.SeatService;
 import com.back.domain.event.entity.Event;
 import com.back.domain.event.entity.EventCategory;
 import com.back.domain.event.entity.EventStatus;
