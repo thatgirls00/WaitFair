@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!local") //TODO 임시데이터 테스트 위해 잠시 비활성화
+//@Profile("!local") //TODO 임시데이터 테스트 위해 잠시 비활성화
 public class QueueEntryScheduler {
 
 	private final QueueEntryRedisRepository queueEntryRedisRepository;

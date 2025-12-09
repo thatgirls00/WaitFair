@@ -58,6 +58,16 @@ public class QueueEntryDataInit implements ApplicationRunner {
 			return;
 		}
 
+		// Long targetEventId = 3L;
+		//
+		// Event event = eventRepository.findById(targetEventId)
+		// 	.orElse(null);
+		//
+		// if (event == null) {
+		// 	log.warn("ID {}에 해당하는 Event가 없습니다. Event를 먼저 생성해주세요.", targetEventId);
+		// 	return;
+		// }
+
 		// Event 상태를 QUEUE_READY로 변경
 		event.changeStatus(EventStatus.QUEUE_READY);
 		eventRepository.save(event);
@@ -80,25 +90,25 @@ public class QueueEntryDataInit implements ApplicationRunner {
 		List<QueueEntry> entries = new ArrayList<>();
 
 		// 1. WAITING 상태 50명 (1~50번)
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 100; i++) {
 			QueueEntry entry = new QueueEntry(users.get(i), event, i + 1);
 			entries.add(entry);
 		}
 
-		// 2. ENTERED 상태 30명 (51~80번)
-		for (int i = 50; i < 80; i++) {
-			QueueEntry entry = new QueueEntry(users.get(i), event, i + 1);
-			entry.enterQueue(); // WAITING → ENTERED
-			entries.add(entry);
-		}
-
-		// 3. EXPIRED 상태 20명 (81~100번)
-		for (int i = 80; i < 100; i++) {
-			QueueEntry entry = new QueueEntry(users.get(i), event, i + 1);
-			entry.enterQueue();
-			entry.expire(); // ENTERED → EXPIRED
-			entries.add(entry);
-		}
+		// // 2. ENTERED 상태 30명 (51~80번)
+		// for (int i = 50; i < 80; i++) {
+		// 	QueueEntry entry = new QueueEntry(users.get(i), event, i + 1);
+		// 	entry.enterQueue(); // WAITING → ENTERED
+		// 	entries.add(entry);
+		// }
+		//
+		// // 3. EXPIRED 상태 20명 (81~100번)
+		// for (int i = 80; i < 100; i++) {
+		// 	QueueEntry entry = new QueueEntry(users.get(i), event, i + 1);
+		// 	entry.enterQueue();
+		// 	entry.expire(); // ENTERED → EXPIRED
+		// 	entries.add(entry);
+		// }
 
 		queueEntryRepository.saveAll(entries);
 		log.info("✅ QueueEntry DB 저장 완료: {}개", entries.size());
@@ -109,24 +119,31 @@ public class QueueEntryDataInit implements ApplicationRunner {
 	 */
 	private void createTestRedisData(Long eventId, List<User> users) {
 		try {
-			// 1. WAITING 큐에 50명 추가 (1~50번)
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < users.size(); i++) {
 				queueEntryRedisRepository.addToWaitingQueue(
 					eventId,
 					users.get(i).getId(),
 					i + 1
 				);
 			}
-			log.info("✅ Redis WAITING 큐 저장: 50명");
-
-			// 2. ENTERED 큐에 30명 추가 (51~80번) - 직접 추가 메서드 사용
-			for (int i = 50; i < 80; i++) {
-				queueEntryRedisRepository.addToEnteredQueueDirectly(
-					eventId,
-					users.get(i).getId()
-				);
-			}
-			log.info("✅ Redis ENTERED 큐 저장: 30명 (TTL: 15분)");
+			// // 1. WAITING 큐에 50명 추가 (1~50번)
+			// for (int i = 0; i < 50; i++) {
+			// 	queueEntryRedisRepository.addToWaitingQueue(
+			// 		eventId,
+			// 		users.get(i).getId(),
+			// 		i + 1
+			// 	);
+			// }
+			// log.info("✅ Redis WAITING 큐 저장: 50명");
+			//
+			// // 2. ENTERED 큐에 30명 추가 (51~80번) - 직접 추가 메서드 사용
+			// for (int i = 50; i < 80; i++) {
+			// 	queueEntryRedisRepository.addToEnteredQueueDirectly(
+			// 		eventId,
+			// 		users.get(i).getId()
+			// 	);
+			// }
+			// log.info("✅ Redis ENTERED 큐 저장: 30명 (TTL: 15분)");
 
 			// 3. ENTERED 카운트 설정
 			queueEntryRedisRepository.setEnteredCount(eventId, 30);

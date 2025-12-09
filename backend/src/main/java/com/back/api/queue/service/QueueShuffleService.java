@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.domain.event.entity.Event;
 import com.back.domain.event.repository.EventRepository;
 import com.back.domain.queue.entity.QueueEntry;
+import com.back.domain.queue.entity.QueueEntryStatus;
 import com.back.domain.queue.repository.QueueEntryRedisRepository;
 import com.back.domain.queue.repository.QueueEntryRepository;
 import com.back.domain.user.entity.User;
@@ -120,6 +121,7 @@ public class QueueShuffleService {
 				.event(event)
 				.user(user)
 				.queueRank(rank)
+				.queueEntryStatus(QueueEntryStatus.WAITING)
 				.build();
 			entries.add(queueEntry);
 		}
