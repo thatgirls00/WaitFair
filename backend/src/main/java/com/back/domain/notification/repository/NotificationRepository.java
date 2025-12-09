@@ -9,8 +9,8 @@ import com.back.domain.user.entity.User;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 	// 전체 조회
-	Page<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
+	Page<Notification> findByUserOrderByCreateAtDesc(User user, Pageable pageable);
 
 	// 읽지 않은 것만 조회
-	Page<Notification> findByUserAndIsReadFalseOrderByCreatedAtDesc(User user, Pageable pageable);
+	Page<Notification> findByUserAndIsReadFalseOrderByCreateAtDesc(User user, Pageable pageable);
 }

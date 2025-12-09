@@ -31,9 +31,9 @@ public class NotificationServiceImpl implements NotificationService {
 		Page<Notification> page;
 
 		if ("UNREAD".equalsIgnoreCase(status)) {
-			page = notificationRepository.findByUserAndIsReadFalseOrderByCreatedAtDesc(user, pageable);
+			page = notificationRepository.findByUserAndIsReadFalseOrderByCreateAtDesc(user, pageable);
 		} else {
-			page = notificationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+			page = notificationRepository.findByUserOrderByCreateAtDesc(user, pageable);
 		}
 
 		return page.map(NotificationResponseDto::fromEntity);
