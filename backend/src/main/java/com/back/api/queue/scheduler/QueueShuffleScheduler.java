@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.back.api.queue.service.QueueShuffleService;
 import com.back.domain.event.entity.Event;
@@ -31,6 +32,7 @@ public class QueueShuffleScheduler {
 	private final QueueShuffleService queueShuffleService;
 	private final QueueSchedulerProperties properties;
 
+	@Transactional
 	@Scheduled(cron = "${queue.scheduler.shuffle.cron}",  zone = "Asia/Seoul") //10분마다 실행
 	public void autoShuffleQueue() {
 		try {
