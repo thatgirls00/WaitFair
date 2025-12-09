@@ -1,39 +1,10 @@
 package com.back.api.notification.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import com.back.domain.event.entity.Event;
-import com.back.domain.notification.entity.Notification;
-import com.back.domain.notification.model.NotificationTypeDetails;
-import com.back.domain.notification.model.NotificationTypes;
-import com.back.domain.notification.repository.NotificationRepository;
-import com.back.domain.user.entity.User;
+import com.back.api.notification.dto.NotificationResponseDto;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@Transactional
-@RequiredArgsConstructor
-public class NotificationService {
-	private final NotificationRepository notificationRepository;
-
-	public Notification createNotification(User user,
-		Event event,
-		NotificationTypes type,
-		NotificationTypeDetails typeDetail,
-		String title,
-		String message) {
-
-		Notification notification = Notification.create(
-			type,
-			typeDetail,
-			title,
-			message,
-			user,
-			event
-		);
-
-		return notificationRepository.save(notification);
-	}
+public interface NotificationService {
+	Page<NotificationResponseDto> getNotifications(Long userId, String status, Pageable pageable);
 }

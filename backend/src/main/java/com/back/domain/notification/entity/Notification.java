@@ -18,12 +18,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 //TODO: User 엔티티쪽에 Cascade 설정 해줘야 함
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "notifications")
 public class Notification extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +58,7 @@ public class Notification extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	@ManyToOne(fetch = FetchType.LAZY) // -> 리팩토링 고민요소
-	@JoinColumn(name = "event_id", nullable = false)
+	@JoinColumn(name = "event_id", nullable = true) // 테스트하느라 잠시 널 허용
 	private Event event;
 
 	private Notification(NotificationTypes type,
