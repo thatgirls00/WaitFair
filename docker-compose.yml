@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: waitfair-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+  redis:
+    image: redis:latest
+    container_name: waitfair-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  backend:
+    image: min7712/waitfair-backend:latest
+    container_name: waitfair-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8080:8080"           # 프론트에서 http://localhost:8080 으로 접속
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      JWT_SECRET: ${JWT_SECRET}
+
+      # DB 설정 (Spring Boot에서는 spring.datasource.* 로 매핑됨)
+      SPRING_DATASOURCE_URL: ${SPRING_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+      # Redis 설정 (spring.data.redis.* 로 매핑)
+      SPRING_DATA_REDIS_HOST: ${REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${REDIS_PORT}
+
+    # 필요하다면 backend 소스 코드를 컨테이너 안에 마운트해서 hot reload 등을 노릴 수 있음 (옵션)
+    # volumes:
+    #   - ./backend:/app
+
+volumes:
+  postgres-data:
+  redis-data:
