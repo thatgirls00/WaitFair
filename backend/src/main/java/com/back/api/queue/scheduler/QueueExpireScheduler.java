@@ -23,7 +23,7 @@ public class QueueExpireScheduler {
 	private final QueueEntryProcessService queueEntryProcessService;
 
 	@Scheduled(cron = "${queue.scheduler.expire.cron}", zone = "Asia/Seoul")
-	public void autoExpireEntries(){
+	public void autoExpireEntries() {
 		try {
 			LocalDateTime now = LocalDateTime.now();
 
@@ -32,7 +32,7 @@ public class QueueExpireScheduler {
 				now
 			);
 
-			if(expiredEntries.isEmpty()){
+			if (expiredEntries.isEmpty()) {
 				return;
 			}
 

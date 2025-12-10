@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.back.domain.event.entity.Event;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Profile("dev")
+@Order(3)
 public class PreRegisterDataInit implements ApplicationRunner {
 
 	private final PreRegisterRepository preRegisterRepository;
@@ -43,7 +45,7 @@ public class PreRegisterDataInit implements ApplicationRunner {
 			return;
 		}
 
-		Long targetEventId = 3L; //사전 등록 중인 이벤트
+		Long targetEventId = 4L; //사전 등록 중인 이벤트
 
 		Event event = eventRepository.findById(targetEventId)
 			.orElse(null);
@@ -52,14 +54,6 @@ public class PreRegisterDataInit implements ApplicationRunner {
 			log.warn("ID {}에 해당하는 Event가 없습니다. Event를 먼저 생성해주세요.", targetEventId);
 			return;
 		}
-		// Event event = eventRepository.findAll().stream()
-		// 	.findFirst()
-		// 	.orElse(null);
-		//
-		// if (event == null) {
-		// 	log.warn("Event 데이터가 없습니다. EventDataInit을 먼저 실행해주세요.");
-		// 	return;
-		// }
 
 		List<PreRegister> preRegisters = createTestPreRegisters(event, users, 150);
 

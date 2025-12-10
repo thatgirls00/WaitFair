@@ -19,9 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /*
  * 대기열 입장 처리 스케줄러
- * 대기열 상위 100명씩 자동 입장
  * WAITING -> ENTERED
- * 스케줄러 동작 주기
  */
 @Component
 @RequiredArgsConstructor

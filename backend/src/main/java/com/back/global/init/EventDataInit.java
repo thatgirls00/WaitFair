@@ -36,55 +36,6 @@ public class EventDataInit implements ApplicationRunner {
 
 		LocalDateTime now = LocalDateTime.now();
 
-		// Event event1 = Event.builder()
-		// 	.title("아이유 2025 콘서트 HEREH WORLD TOUR")
-		// 	.category(EventCategory.CONCERT)
-		// 	.description("아이유의 월드투어 서울 공연입니다. 최고의 무대를 만나보세요!")
-		// 	.place("올림픽공원 체조경기장")
-		// 	.imageUrl("https://example.com/iu-concert.jpg")
-		// 	.minPrice(99000)
-		// 	.maxPrice(154000)
-		// 	.preOpenAt(now.minusDays(7))
-		// 	.preCloseAt(now.minusDays(5))
-		// 	.ticketOpenAt(now.minusDays(3))
-		// 	.ticketCloseAt(now.plusDays(30))
-		// 	.maxTicketAmount(5000)
-		// 	.status(EventStatus.OPEN)
-		// 	.build();
-		//
-		// Event event2 = Event.builder()
-		// 	.title("나이키 에어맥스 한정판 드롭")
-		// 	.category(EventCategory.DROP)
-		// 	.description("나이키 에어맥스 한정판 스니커즈 드롭 이벤트입니다.")
-		// 	.place("온라인")
-		// 	.imageUrl("https://example.com/nike-airmax.jpg")
-		// 	.minPrice(189000)
-		// 	.maxPrice(189000)
-		// 	.preOpenAt(now.plusDays(1))
-		// 	.preCloseAt(now.plusDays(3))
-		// 	.ticketOpenAt(now.plusDays(5))
-		// 	.ticketCloseAt(now.plusDays(7))
-		// 	.maxTicketAmount(500)
-		// 	.status(EventStatus.READY)
-		// 	.build();
-		//
-		// Event event3 = Event.builder()
-		// 	.title("디즈니 100주년 팝업 스토어")
-		// 	.category(EventCategory.POPUP)
-		// 	.description("디즈니 100주년 기념 팝업스토어에서 특별한 굿즈를 만나보세요.")
-		// 	.place("성수동 S-Factory")
-		// 	.imageUrl("https://example.com/disney-popup.jpg")
-		// 	.minPrice(15000)
-		// 	.maxPrice(250000)
-		// 	.preOpenAt(now.minusDays(10))
-		// 	.preCloseAt(now.minusDays(8))
-		// 	.ticketOpenAt(now.minusDays(5))
-		// 	.ticketCloseAt(now.plusDays(14))
-		// 	.maxTicketAmount(3000)
-		// 	.status(EventStatus.PRE_OPEN)
-		// 	.build();
-
-
 		Event event1 = Event.builder()
 			.title("아이유 2025 콘서트 HEREH WORLD TOUR")
 			.category(EventCategory.CONCERT)
@@ -109,9 +60,9 @@ public class EventDataInit implements ApplicationRunner {
 			.imageUrl("https://example.com/nike-airmax.jpg")
 			.minPrice(189000)
 			.maxPrice(189000)
-			.preOpenAt(now.minusDays(10))
-			.preCloseAt(now.minusDays(8))
-			.ticketOpenAt(now.plusHours(2))
+			.preOpenAt(now.plusDays(1))
+			.preCloseAt(now.plusDays(3))
+			.ticketOpenAt(now.plusDays(5))
 			.ticketCloseAt(now.plusDays(7))
 			.maxTicketAmount(500)
 			.status(EventStatus.READY)
@@ -127,6 +78,23 @@ public class EventDataInit implements ApplicationRunner {
 			.maxPrice(250000)
 			.preOpenAt(now.minusDays(10))
 			.preCloseAt(now.minusDays(8))
+			.ticketOpenAt(now.minusDays(5))
+			.ticketCloseAt(now.plusDays(14))
+			.maxTicketAmount(3000)
+			.status(EventStatus.PRE_OPEN)
+			.build();
+
+
+		Event event4 = Event.builder()
+			.title("2025 스프링 재즈 나이트")
+			.category(EventCategory.CONCERT)
+			.description("국내 최고의 재즈 아티스트들과 함께하는 밤, 감성 가득한 스프링 재즈 콘서트를 즐겨보세요.")
+			.place("예술의전당 콘서트홀")
+			.imageUrl("https://example.com/jazz-night.jpg")
+			.minPrice(15000)
+			.maxPrice(250000)
+			.preOpenAt(now.minusDays(10))
+			.preCloseAt(now.minusDays(8))
 			.ticketOpenAt(now.plusHours(1).plusMinutes(13))
 			.ticketCloseAt(now.plusDays(14))
 			.maxTicketAmount(3000)
@@ -136,7 +104,8 @@ public class EventDataInit implements ApplicationRunner {
 		eventRepository.save(event1);
 		eventRepository.save(event2);
 		eventRepository.save(event3);
+		eventRepository.save(event4);
 
-		log.info("Event 초기 데이터 3개가 생성되었습니다.");
+		log.info("Event 초기 데이터 4개가 생성되었습니다.");
 	}
 }

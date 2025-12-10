@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 /*
  * 대기열 셔플 스케줄러
  * ticketOpenAt 1시간 전 대기열 셔플 자동 실행 -> 이벤트 상태 PREOPEN에서 READY로 변경
- * 스케줄러 동작 주기 : 10분
  */
 @Component
 @RequiredArgsConstructor
