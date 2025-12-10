@@ -19,13 +19,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "tickets")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Builder
 public class Ticket extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_seq")
@@ -71,5 +75,24 @@ public class Ticket extends BaseEntity {
 	public void markAsUsed() {
 		this.ticketStatus = TicketStatus.USED;
 		this.usedAt = LocalDateTime.now();
+	}
+
+	public void markPaid() {
+		if (this.ticketStatus != TicketStatus.DRAFT) {
+			throw new IllegalStateException();
+		}
+		this.ticketStatus = TicketStatus.PAID;
+	}
+
+	public void issue() {
+		if (this.ticketStatus != TicketStatus.PAID) {
+			throw new IllegalStateException();
+		}
+		this.ticketStatus = TicketStatus.ISSUED;
+		this.issuedAt = LocalDateTime.now();
+	}
+
+	public void fail() {
+		this.ticketStatus = TicketStatus.FAILED;
 	}
 }
