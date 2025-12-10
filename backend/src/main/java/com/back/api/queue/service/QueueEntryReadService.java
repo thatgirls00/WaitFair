@@ -17,6 +17,7 @@ import com.back.global.error.code.QueueEntryErrorCode;
 import com.back.global.error.exception.ErrorException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /*
  * 대기열 조회 로직
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class QueueEntryReadService {
 
 	private final QueueEntryRepository queueEntryRepository;
@@ -44,7 +46,7 @@ public class QueueEntryReadService {
 		};
 	}
 
-	//Redis 기반
+	//Redis 먼저 조회
 	private WaitingQueueResponse buildWaitingQueueResponse(Long eventId, QueueEntry entry) {
 		Long currentRank = queueEntryRedisRepository.getMyRankInWaitingQueue(eventId, entry.getUserId());
 		Long waitingAheadCount = queueEntryRedisRepository.getWaitingAheadCount(eventId, entry.getUserId());
@@ -120,8 +122,32 @@ public class QueueEntryReadService {
 		);
 	}
 
+	//대기열에 있는 지 확인
 	public boolean existsInWaitingQueue(Long eventId, Long userId) {
+		try {
+			if (queueEntryRedisRepository.isInWaitingQueue(eventId, userId)
+				|| queueEntryRedisRepository.isInEnteredQueue(eventId, userId)) {
+				return true;
+			}
+		} catch (Exception e) {
+			log.warn("Redis 조회 실패, DB Fallback");
+		}
 		return queueEntryRepository.existsByEvent_IdAndUser_Id(eventId, userId);
+	}
+
+	//대기열 ENTERED 상태인지 확인
+	//Redis & DB
+	public boolean isUserEntered(Long eventId, Long userId) {
+		try {
+			return queueEntryRedisRepository.isInEnteredQueue(eventId, userId);
+		} catch (Exception e) {
+			log.warn("Redis ENTERED 조회 실패, DB Fallback");
+
+			return queueEntryRepository
+				.findByEvent_IdAndUser_Id(eventId, userId)
+				.map(entry -> entry.getQueueEntryStatus() == QueueEntryStatus.ENTERED)
+				.orElse(false);
+		}
 	}
 
 
@@ -157,7 +183,5 @@ public class QueueEntryReadService {
 		);
 
 	}
-
-
 
 }
