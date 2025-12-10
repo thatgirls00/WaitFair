@@ -3,9 +3,9 @@ package com.back.api.selection.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.back.api.queue.service.QueueEntryReadService;
 import com.back.api.seat.service.SeatService;
 import com.back.api.ticket.service.TicketService;
+import com.back.domain.queue.repository.QueueEntryRedisRepository;
 import com.back.domain.seat.entity.Seat;
 import com.back.domain.ticket.entity.Ticket;
 import com.back.global.error.code.SeatErrorCode;
@@ -22,7 +22,7 @@ public class SeatSelectionService {
 
 	private final SeatService seatService;
 	private final TicketService ticketService;
-	private final QueueEntryReadService queueEntryReadService;
+	private final QueueEntryRedisRepository queueEntryRedisRepository;
 
 	/**
 	 * 좌석 선택 + DraftTicket 생성
@@ -38,8 +38,9 @@ public class SeatSelectionService {
 		return draftTicket;
 	}
 
+	// TODO : repository가 아닌 service 메소드로 QUEUE 검증
 	private void validateQueueEntry(Long eventId, Long userId) {
-		if (!queueEntryReadService.existsInWaitingQueue(eventId, userId)) {
+		if (!queueEntryRedisRepository.isInEnteredQueue(eventId, userId)) {
 			throw new ErrorException(SeatErrorCode.NOT_IN_QUEUE);
 		}
 	}

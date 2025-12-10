@@ -56,7 +56,7 @@ public class Ticket extends BaseEntity {
 	@Column(name = "ticket_status", nullable = false)
 	private TicketStatus ticketStatus;
 
-	@Column(name = "issued_at", nullable = false)
+	@Column(name = "issued_at")
 	private LocalDateTime issuedAt;
 
 	@Column(name = "used_at")

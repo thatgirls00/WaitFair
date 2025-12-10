@@ -101,7 +101,7 @@ public class TicketService {
 		Seat seat = ticket.getSeat();
 
 		// 좌석 잠금 해제
-		seatService.markSeatAsSold(seat);
+		seatService.markSeatAsAvailable(seat);
 
 		// 티켓 실패 처리
 		ticket.fail();
