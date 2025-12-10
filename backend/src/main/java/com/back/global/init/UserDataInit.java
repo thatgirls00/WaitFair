@@ -40,7 +40,7 @@ public class UserDataInit implements ApplicationRunner {
 			.nickname("홍길동")
 			.password(passwordEncoder.encode("password123"))
 			.birthDate(LocalDate.of(1990, 1, 1))
-			.role(UserRole.USER)
+			.role(UserRole.NORMAL)
 			.activeStatus(UserActiveStatus.ACTIVE)
 			.build();
 
