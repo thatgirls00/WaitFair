@@ -38,9 +38,9 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 	@Query("""
 		SELECT s.seatCode FROM Seat s
 		WHERE s.event.id = :eventId
-		  AND s.grade = :grade
-		  AND s.seatCode = :seatCode
-		  AND s.id <> :seatId
+			AND s.grade = :grade
+			AND s.seatCode = :seatCode
+			AND s.id <> :seatId
 		""")
 	List<String> findExistingSeatCodesExceptSelf(Long eventId, SeatGrade grade, String seatCode, Long seatId);
 }

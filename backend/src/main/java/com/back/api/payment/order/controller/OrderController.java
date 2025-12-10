@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 	private final OrderService orderService;
 
-
 	@PostMapping("/api/v1/order")
 	public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
 		Order order = orderService.createOrder(orderRequestDto);
