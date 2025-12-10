@@ -96,8 +96,6 @@ public class QueueEntryRedisRepository {
 		return isMember != null && isMember;
 	}
 
-
-
 	/* ==================== 카운터 관련 메서드 ==================== */
 	public Long incrementEnteredCount(Long eventId) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
@@ -107,8 +105,9 @@ public class QueueEntryRedisRepository {
 	public Long getEnteredCount(Long eventId) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
 		Object count = redisTemplate.opsForValue().get(key);
-		return count != null ? (Long) count : 0L;
+		return count != null ? (Long)count : 0L;
 	}
+
 
 	/* ==================== 임시 데이터 추가용 ==================== */
 	public void addToEnteredQueueDirectly(Long eventId, Long userId) {
@@ -123,6 +122,20 @@ public class QueueEntryRedisRepository {
 	public void setEnteredCount(Long eventId, int count) {
 		String key = String.format(ENTERED_COUNT_KEY, eventId);
 		redisTemplate.opsForValue().set(key, count);
+	}
+
+	/**
+	 * 테스트용: 특정 이벤트의 모든 큐 데이터 삭제
+	 */
+	public void clearAll(Long eventId) {
+		String waitingKey = String.format(WAITING_KEY, eventId);
+		String enteredKey = String.format(ENTERED_KEY, eventId);
+		String countKey = String.format(ENTERED_COUNT_KEY, eventId);
+
+		redisTemplate.delete(waitingKey);
+		redisTemplate.delete(enteredKey);
+		redisTemplate.delete(countKey);
+
 	}
 
 }

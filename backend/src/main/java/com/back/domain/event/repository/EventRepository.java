@@ -28,7 +28,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("SELECT e FROM Event e WHERE e.category = :category AND e.deleted = false ORDER BY e.createAt DESC")
 	Page<Event> findByCategoryOrderByCreateAtDesc(@Param("category") EventCategory category, Pageable pageable);
 
-	@Query("SELECT e FROM Event e WHERE e.status = :status AND e.category = :category AND e.deleted = false ORDER BY e.createAt DESC")
+	@Query("""
+			SELECT e
+			FROM Event e
+			WHERE e.status = :status
+			AND e.category = :category AND e.deleted = false
+			ORDER BY e.createAt DESC
+		""")
 	Page<Event> findByStatusAndCategoryOrderByCreateAtDesc(
 		@Param("status") EventStatus status,
 		@Param("category") EventCategory category,
@@ -47,7 +53,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("SELECT e FROM Event e WHERE e.status = :status AND e.deleted = false")
 	List<Event> findByStatus(@Param("status") EventStatus status);
 
-	@Query("SELECT e FROM Event e WHERE e.ticketOpenAt BETWEEN :start AND :end AND e.status = :status AND e.deleted = false")
+	@Query("""
+			SELECT e
+			FROM Event e
+			WHERE e.ticketOpenAt
+			BETWEEN :start AND :end AND e.status = :status AND e.deleted = false
+		""")
 	List<Event> findByTicketOpenAtBetweenAndStatus(
 		@Param("start") LocalDateTime start,
 		@Param("end") LocalDateTime end,
