@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.back.domain.auth.repository.RefreshTokenRepository;
 import com.back.domain.user.entity.User;
 import com.back.domain.user.entity.UserRole;
 import com.back.domain.user.repository.UserRepository;
@@ -43,6 +44,9 @@ public class AuthControllerTest {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private RefreshTokenRepository tokenRepository;
 
 	@Autowired
 	private UserHelper userHelper;
@@ -319,6 +323,77 @@ public class AuthControllerTest {
 				.andExpect(handler().methodName("login"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value(error.getMessage()));
+		}
+
+		@Test
+		@DisplayName("한 사용자가 여러 기기에서 동시에 로그인할 수 있다")
+		void login_multi_devices_success() throws Exception {
+			// given: 하나의 유저 생성
+			TestUser existedUser = userHelper.createUser(UserRole.NORMAL);
+			User savedUser = existedUser.user();
+			String rawPassword = existedUser.rawPassword();
+
+			String requestJson = mapper.writeValueAsString(Map.of(
+				"email", savedUser.getEmail(),
+				"password", rawPassword
+			));
+
+			// when: 같은 계정으로 1번째 기기 로그인
+			ResultActions actions1 = mvc.perform(
+				post(loginApi)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(requestJson)
+			).andDo(print());
+
+			// and: 같은 계정으로 2번째 기기 로그인
+			ResultActions actions2 = mvc.perform(
+				post(loginApi)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(requestJson)
+			).andDo(print());
+
+			// then: 두 요청 모두 성공 응답
+			actions1
+				.andExpect(handler().handlerType(AuthController.class))
+				.andExpect(handler().methodName("login"))
+				.andExpect(jsonPath("$.status").value(HttpStatus.CREATED.name()))
+				.andExpect(jsonPath("$.message").value("로그인 성공"));
+
+			actions2
+				.andExpect(handler().handlerType(AuthController.class))
+				.andExpect(handler().methodName("login"))
+				.andExpect(jsonPath("$.status").value(HttpStatus.CREATED.name()))
+				.andExpect(jsonPath("$.message").value("로그인 성공"));
+
+			// 응답 바디 파싱
+			String body1 = actions1.andReturn().getResponse().getContentAsString();
+			String body2 = actions2.andReturn().getResponse().getContentAsString();
+
+			var node1 = mapper.readTree(body1);
+			var node2 = mapper.readTree(body2);
+
+			long userId1 = node1.path("data").path("user").path("userId").asLong();
+			long userId2 = node2.path("data").path("user").path("userId").asLong();
+
+			String accessToken1 = node1.path("data").path("tokens").path("accessToken").asText();
+			String accessToken2 = node2.path("data").path("tokens").path("accessToken").asText();
+
+			String refreshToken1 = node1.path("data").path("tokens").path("refreshToken").asText();
+			String refreshToken2 = node2.path("data").path("tokens").path("refreshToken").asText();
+
+			// 같은 유저로부터 발급된 토큰인지 확인
+			assertThat(userId1).isEqualTo(savedUser.getId());
+			assertThat(userId2).isEqualTo(savedUser.getId());
+
+			// 각 요청마다 토큰이 정상 발급되었는지
+			assertThat(accessToken1).isNotBlank();
+			assertThat(accessToken2).isNotBlank();
+			assertThat(refreshToken1).isNotBlank();
+			assertThat(refreshToken2).isNotBlank();
+
+			// DB에서 refreshToken 이 2개인지 검증
+			long tokenCount = tokenRepository.countByUserId(savedUser.getId());
+			assertThat(tokenCount).isEqualTo(2);
 		}
 	}
 }
