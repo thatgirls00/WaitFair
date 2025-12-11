@@ -6,6 +6,8 @@ import com.back.domain.event.entity.Event;
 import com.back.domain.seat.entity.Seat;
 import com.back.domain.user.entity.User;
 import com.back.global.entity.BaseEntity;
+import com.back.global.error.code.TicketErrorCode;
+import com.back.global.error.exception.ErrorException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,27 +74,45 @@ public class Ticket extends BaseEntity {
 		return ticket;
 	}
 
-	public void markAsUsed() {
-		this.ticketStatus = TicketStatus.USED;
-		this.usedAt = LocalDateTime.now();
-	}
-
+	// DRAFT → PAID
 	public void markPaid() {
 		if (this.ticketStatus != TicketStatus.DRAFT) {
-			throw new IllegalStateException();
+			throw new ErrorException(TicketErrorCode.INVALID_TICKET_STATE);
 		}
 		this.ticketStatus = TicketStatus.PAID;
 	}
 
+	// PAID → ISSUED
 	public void issue() {
 		if (this.ticketStatus != TicketStatus.PAID) {
-			throw new IllegalStateException();
+			throw new ErrorException(TicketErrorCode.INVALID_TICKET_STATE);
 		}
 		this.ticketStatus = TicketStatus.ISSUED;
 		this.issuedAt = LocalDateTime.now();
 	}
 
+	// ISSUED → USED
+	public void markAsUsed() {
+		if (this.ticketStatus != TicketStatus.ISSUED) {
+			throw new ErrorException(TicketErrorCode.INVALID_TICKET_STATE);
+		}
+		this.ticketStatus = TicketStatus.USED;
+		this.usedAt = LocalDateTime.now();
+	}
+
+	// DRAFT → FAILED (결제 실패)
 	public void fail() {
+		if (this.ticketStatus != TicketStatus.DRAFT) {
+			throw new ErrorException(TicketErrorCode.INVALID_TICKET_STATE);
+		}
 		this.ticketStatus = TicketStatus.FAILED;
+	}
+
+	// DRAFT → CANCELLED (사용자 취소)
+	public void cancel() {
+		if (this.ticketStatus != TicketStatus.DRAFT) {
+			throw new ErrorException(TicketErrorCode.INVALID_TICKET_STATE);
+		}
+		this.ticketStatus = TicketStatus.CANCELLED;
 	}
 }

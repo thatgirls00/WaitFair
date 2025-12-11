@@ -3,12 +3,13 @@ package com.back.api.payment.order.service;
 import org.springframework.stereotype.Service;
 
 import com.back.api.payment.order.dto.request.OrderRequestDto;
-import com.back.api.seat.service.SeatService;
+import com.back.api.ticket.service.TicketService;
 import com.back.domain.event.repository.EventRepository;
 import com.back.domain.payment.order.entity.Order;
 import com.back.domain.payment.order.entity.OrderStatus;
 import com.back.domain.payment.order.repository.OrderRepository;
 import com.back.domain.seat.repository.SeatRepository;
+import com.back.domain.ticket.entity.Ticket;
 import com.back.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,14 @@ public class OrderService {
 	private final EventRepository eventRepository;
 	private final UserRepository userRepository;
 	private final SeatRepository seatRepository;
-	private final SeatService seatService;
+	private final TicketService ticketService;
 
 	public Order createOrder(OrderRequestDto orderRequestDto) {
+
+		// 티켓이 DRAFT 상태인지 확인
+		Ticket draft = ticketService.getDraftTicket(orderRequestDto.seatId(), orderRequestDto.userId());
+
+		// 주문 생성
 		Order newOrder = Order.builder()
 			.amount(orderRequestDto.amount())
 			.event(eventRepository.getReferenceById(orderRequestDto.eventId()))
@@ -31,8 +37,10 @@ public class OrderService {
 			.status(OrderStatus.PAID)
 			.build();
 		orderRepository.save(newOrder);
-		//seatService.confirmPurchase(orderRequestDto.eventId(), orderRequestDto.seatId(), orderRequestDto.userId());
-		// Todo : 티켓 생성 서비스 호출
+
+		// 티켓 상태를 PAID로 변경
+		ticketService.confirmPayment(draft.getId(), orderRequestDto.userId());
+
 		return newOrder;
 	}
 }
