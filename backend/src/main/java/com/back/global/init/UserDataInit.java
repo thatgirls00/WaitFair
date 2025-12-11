@@ -59,10 +59,13 @@ public class UserDataInit implements ApplicationRunner {
 	private List<User> createTestUsers(int count) {
 		List<User> users = new ArrayList<>();
 
+		// 비밀번호를 한 번만 암호화하여 재사용 (성능 최적화)
+		String encodedPassword = passwordEncoder.encode("abc12345");
+
 		for (int i = 1; i <= count; i++) {
 			User user = User.builder()
 				.email("test" + i + "@test.com")
-				.password(passwordEncoder.encode("abc12345"))
+				.password(encodedPassword)
 				.nickname("test" + i)
 				.role(UserRole.NORMAL)
 				.birthDate(LocalDate.of(2000, 1, 1))
