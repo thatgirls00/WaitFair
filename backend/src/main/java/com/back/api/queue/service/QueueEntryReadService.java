@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * Redis 우선 조회 -> DB 조회
  * 트랜잭션 읽기 / 쓰기 분리 고려
  * TODO 사용자 / 관리자 권한 분리
+ * TODO 시간 계산 로직 수정
  */
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,39 @@ public class QueueEntryReadService {
 		};
 	}
 
+	public WaitingQueueResponse buildWaitingQueueResponseFromRank(
+		Long userId,
+		Long eventId,
+		int rank,
+		int waitingAhead,
+		int totalWaitingCount
+	) {
+		int estimatedWaitTime;
+		int progress;
+
+		// 1순위 사용자 처리
+		if (waitingAhead == 0) {
+			estimatedWaitTime = 3;
+			progress = 99;
+		} else {
+			estimatedWaitTime = waitingAhead * 3;
+			progress = totalWaitingCount > 0
+				? (int) (((totalWaitingCount - waitingAhead) * 100) / totalWaitingCount)
+				: 0;
+		}
+
+		return WaitingQueueResponse.from(
+			userId,
+			eventId,
+			rank,
+			waitingAhead,
+			estimatedWaitTime,
+			progress
+		);
+	}
+
+	//Redis 조회 + 계산
+	//단일 사용자 조회 (API에서 사용 예정)
 	public WaitingQueueResponse buildWaitingQueueResponseForUser(Long eventId, Long userId) {
 		Long currentRank = queueEntryRedisRepository.getMyRankInWaitingQueue(eventId, userId);
 		Long waitingAheadCount = queueEntryRedisRepository.getWaitingAheadCount(eventId, userId);
@@ -56,31 +90,12 @@ public class QueueEntryReadService {
 			return null;
 		}
 
-		int estimatedWaitTime;
-		int progress;
-
-		//1순위 사용자
-		if(waitingAheadCount == 0) {
-			estimatedWaitTime = 3; // 최소 대기시간 3분
-			progress = 99;         // 100% 직전 구간
-		} else {
-			//TODO 시간 계산 로직 수정
-			estimatedWaitTime = (int) (waitingAheadCount * 3); //대기 인원당 3분 가정
-
-			progress = totalWaitingCount > 0
-				? (int) (((totalWaitingCount - waitingAheadCount) * 100) / totalWaitingCount)
-				: 0;
-		}
-
-
-
-		return WaitingQueueResponse.from(
+		return buildWaitingQueueResponseFromRank(
 			userId,
 			eventId,
 			currentRank.intValue(),
 			waitingAheadCount.intValue(),
-			estimatedWaitTime,
-			progress
+			totalWaitingCount.intValue()
 		);
 	}
 
@@ -105,29 +120,12 @@ public class QueueEntryReadService {
 			eventId, QueueEntryStatus.WAITING
 		);
 
-		int estimatedWaitTime;
-		int progress;
-
-		//1순위 사용자
-		if(waitingAheadCount == 0) {
-			estimatedWaitTime = 3; // 최소 대기시간 3분
-			progress = 99;         // 100% 직전 구간
-		} else {
-			//TODO 시간 계산 로직 수정
-			estimatedWaitTime = (int) (waitingAheadCount * 3); //대기 인원당 3분 가정
-
-			progress = totalWaitingCount > 0
-				? (int) (((totalWaitingCount - waitingAheadCount) * 100) / totalWaitingCount)
-				: 0;
-		}
-
-		return WaitingQueueResponse.from(
+		return buildWaitingQueueResponseFromRank(
 			entry.getUserId(),
 			entry.getEventId(),
 			entry.getQueueRank(),
-			(int)waitingAheadCount,
-			estimatedWaitTime,
-			progress
+			(int) waitingAheadCount,
+			(int) totalWaitingCount
 		);
 	}
 

@@ -1,12 +1,16 @@
 package com.back.api.queue.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.back.api.queue.dto.event.WaitingQueueBatchEvent;
 import com.back.api.queue.dto.response.CompletedQueueResponse;
 import com.back.api.queue.dto.response.EnteredQueueResponse;
 import com.back.api.queue.dto.response.ExpiredQueueResponse;
@@ -182,37 +186,49 @@ public class QueueEntryProcessService {
 
 	public void publishWaitingUpdateEvents(Long eventId) {
 		try {
-			Long currentWaitingCount = queueEntryRedisRepository.getTotalWaitingCount(eventId);
-			if (currentWaitingCount == 0) {
+
+			// 1. Redis 호출 1번으로 전체 대기열 조회
+			Set<ZSetOperations.TypedTuple<Object>> allWaitingUsers = queueEntryRedisRepository.getAllWaitingUsersWithRank(eventId);
+
+			if (allWaitingUsers == null || allWaitingUsers.isEmpty()) {
 				return;
 			}
 
-			//TODO 실시간 업데이트 보여주는 인원을 어떻게 설정할것인가? 너무 많아지면 부하
-			//TODO 전체 반복문 제거하고 단 한번의 이벤트 broadcast하도록 변경
-			int updateLimit = Math.min(200, currentWaitingCount.intValue());
-			Set<Object> topWaitingUsers = queueEntryRedisRepository
-				.getTopWaitingUsers(eventId, updateLimit);
+			int totalWaitingCount = allWaitingUsers.size();
 
-			int successCount = 0;
+			Map<Long, WaitingQueueResponse> allUpdates = new HashMap<>();
+			int rank = 1;
 
-			for (Object user : topWaitingUsers) {
+			for (ZSetOperations.TypedTuple<Object> tuple : allWaitingUsers) {
 				try {
-					Long userId = Long.parseLong(user.toString());
+					Long userId = Long.parseLong(tuple.getValue().toString());
+					int waitingAhead = rank - 1;
 
-					WaitingQueueResponse response = queueEntryReadService.buildWaitingQueueResponseForUser(eventId, userId);
+					WaitingQueueResponse response = queueEntryReadService
+						.buildWaitingQueueResponseFromRank(
+							userId,
+							eventId,
+							rank,
+							waitingAhead,
+							totalWaitingCount
+						);
 
-					if(response != null) {
-						eventPublisher.publishEvent(response);
-						successCount ++;
-					}
+					allUpdates.put(userId, response);
+					rank++;
+
+				} catch (Exception e) {
+					log.error("개별 사용자 업데이트 준비 실패 - user: {}", tuple.getValue(), e);
 				}
-				catch (Exception e) {
-					log.error("개별 사용자 순위 업데이트 실패 - userId: {}", user, e);
-				}
+			}
+
+			if(!allUpdates.isEmpty()) {
+				WaitingQueueBatchEvent batchEvent = WaitingQueueBatchEvent.from(eventId, allUpdates);
+				eventPublisher.publishEvent(batchEvent);
+				log.info("실시간 순위 업데이트 완료 - eventId: {}, 대상: {}명", eventId, allUpdates.size());
 			}
  		}
 		catch (Exception e) {
-			log.error("사용자 순위 업데이트 실패 - userId: {}", eventId, e);
+			log.error("실시간 순위 업데이트 실패 - userId: {}", eventId, e);
 		}
 	}
 
