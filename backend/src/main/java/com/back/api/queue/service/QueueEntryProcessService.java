@@ -5,12 +5,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.back.api.queue.dto.response.CompletedQueueResponse;
+import com.back.api.queue.dto.response.EnteredQueueResponse;
+import com.back.api.queue.dto.response.ExpiredQueueResponse;
 import com.back.domain.queue.entity.QueueEntry;
 import com.back.domain.queue.entity.QueueEntryStatus;
 import com.back.domain.queue.repository.QueueEntryRedisRepository;
 import com.back.domain.queue.repository.QueueEntryRepository;
 import com.back.global.error.code.QueueEntryErrorCode;
 import com.back.global.error.exception.ErrorException;
+import com.back.global.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,18 +33,22 @@ public class QueueEntryProcessService {
 
 	private final QueueEntryRepository queueEntryRepository;
 	private final QueueEntryRedisRepository queueEntryRedisRepository;
+	private final EventPublisher eventPublisher;
 
 	@Transactional
 	public void processEntry(Long eventId, Long userId) {
-		QueueEntry entry = queueEntryRepository.findByEvent_IdAndUser_Id(eventId, userId)
+		QueueEntry queueEntry = queueEntryRepository.findByEvent_IdAndUser_Id(eventId, userId)
 			.orElseThrow(() -> new ErrorException(QueueEntryErrorCode.NOT_FOUND_QUEUE_ENTRY));
 
-		validateEntry(entry);
+		validateEntry(queueEntry);
 
-		entry.enterQueue();
-		queueEntryRepository.save(entry);
+		queueEntry.enterQueue();
+		queueEntryRepository.save(queueEntry);
 
 		updateRedis(eventId, userId);
+
+		publishEnteredEvent(queueEntry); // 입장 처리 웹소켓 이벤트 발행
+
 		//TODO 입장완료 알림 로직 구현
 	}
 
@@ -96,6 +104,18 @@ public class QueueEntryProcessService {
 		}
 	}
 
+	private void publishEnteredEvent(QueueEntry queueEntry) {
+		EnteredQueueResponse response = EnteredQueueResponse.from (
+			queueEntry.getUserId(),
+			queueEntry.getEventId(),
+			queueEntry.getEnteredAt(),
+			queueEntry.getExpiredAt()
+		);
+
+		eventPublisher.publishEvent(response);
+	}
+
+
 	public boolean canEnterEntry(Long eventId, Long userId) {
 		return queueEntryRepository
 			.findByEvent_IdAndUser_Id(eventId, userId)
@@ -126,6 +146,8 @@ public class QueueEntryProcessService {
 			log.error("eventId {} - Redis 만료 처리 실패", eventId);
 		}
 
+		publishExpiredEvent(queueEntry);  // 만료 처리 웹소켓 이벤트 발행
+
 		//TODO 알림 로직 구현 필요
 	}
 
@@ -139,6 +161,15 @@ public class QueueEntryProcessService {
 			successCount++;
 		}
 		log.info("총 {}개 대기열 항목 만료 처리 완료", successCount);
+	}
+
+	private void publishExpiredEvent(QueueEntry queueEntry) {
+		ExpiredQueueResponse response = ExpiredQueueResponse.from(
+			queueEntry.getUserId(),
+			queueEntry.getEventId()
+		);
+
+		eventPublisher.publishEvent(response);
 	}
 
 	//TODO 결제 도메인에서 사용 필요
@@ -158,6 +189,8 @@ public class QueueEntryProcessService {
 		} catch (Exception e) {
 			log.error("결제 완료 사용자 대기열 제거 실패");
 		}
+
+		publishCompletedEvent(queueEntry); // 결제 완료 처리 웹소켓 이벤트 발행
 
 	}
 
@@ -184,5 +217,16 @@ public class QueueEntryProcessService {
 			throw new ErrorException(QueueEntryErrorCode.NOT_ENTERED_STATUS);
 		}
 	}
+
+	private void publishCompletedEvent(QueueEntry queueEntry) {
+		CompletedQueueResponse response = CompletedQueueResponse.from(
+			queueEntry.getUserId(),
+			queueEntry.getEventId()
+		);
+
+		eventPublisher.publishEvent(response);
+
+	}
+
 
 }

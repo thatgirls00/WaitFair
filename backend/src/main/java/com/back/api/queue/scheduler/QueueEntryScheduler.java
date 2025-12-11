@@ -13,6 +13,7 @@ import com.back.api.queue.service.QueueEntryProcessService;
 import com.back.domain.event.entity.Event;
 import com.back.domain.event.entity.EventStatus;
 import com.back.domain.queue.repository.QueueEntryRedisRepository;
+import com.back.global.event.EventPublisher;
 import com.back.global.properties.QueueSchedulerProperties;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 /*
  * 대기열 입장 처리 스케줄러
  * WAITING -> ENTERED
+ * WAITING 상태 사용자에게 실시간 순위 업데이트 (WebSocket)
  */
 @Component
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class QueueEntryScheduler {
 	private final QueueEntryRedisRepository queueEntryRedisRepository;
 	private final QueueEntryProcessService queueEntryProcessService;
 	private final EventService eventService;
+	private final EventPublisher eventPublisher;
 	private final QueueSchedulerProperties properties;
 
 	//대기열 자동 입장 처리
@@ -78,7 +81,6 @@ public class QueueEntryScheduler {
 
 		//한번에 입장시킬 인원
 		int batchSize = properties.getEntry().getBatchSize();
-		log.info("배치사이즈 : {}", batchSize);
 
 		// 입장 인원 선정
 		// 빈 자리 순차적으로 들어갈 수 있도록 함
