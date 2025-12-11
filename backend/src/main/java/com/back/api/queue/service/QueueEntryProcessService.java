@@ -1,6 +1,8 @@
 package com.back.api.queue.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.api.queue.dto.response.CompletedQueueResponse;
 import com.back.api.queue.dto.response.EnteredQueueResponse;
 import com.back.api.queue.dto.response.ExpiredQueueResponse;
+import com.back.domain.event.entity.Event;
 import com.back.domain.queue.entity.QueueEntry;
 import com.back.domain.queue.entity.QueueEntryStatus;
 import com.back.domain.queue.repository.QueueEntryRedisRepository;
@@ -15,6 +18,7 @@ import com.back.domain.queue.repository.QueueEntryRepository;
 import com.back.global.error.code.QueueEntryErrorCode;
 import com.back.global.error.exception.ErrorException;
 import com.back.global.event.EventPublisher;
+import com.back.global.properties.QueueSchedulerProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +38,7 @@ public class QueueEntryProcessService {
 	private final QueueEntryRepository queueEntryRepository;
 	private final QueueEntryRedisRepository queueEntryRedisRepository;
 	private final EventPublisher eventPublisher;
+	private final QueueSchedulerProperties properties;
 
 	@Transactional
 	public void processEntry(Long eventId, Long userId) {
@@ -113,6 +118,64 @@ public class QueueEntryProcessService {
 		);
 
 		eventPublisher.publishEvent(response);
+	}
+
+	//특정 이벤트 대기열 처리
+	@Transactional
+	public void processEventQueueEntries(Event event) {
+
+		Long eventId = event.getId();
+
+		//대기 중인 인원 확인
+		Long totalWaitingCount = queueEntryRedisRepository.getTotalWaitingCount(eventId);
+
+		if (totalWaitingCount == 0) {
+			return;
+		}
+
+		//입장 완료된 인원 확인
+		Long currentEnteredCount = queueEntryRedisRepository.getTotalEnteredCount(eventId);
+		int maxEnteredLimit = properties.getEntry().getMaxEnteredLimit();
+
+		//입장 가능한 인원 확인
+		int availableEnteredCount = maxEnteredLimit - currentEnteredCount.intValue();
+
+		if (availableEnteredCount <= 0) {
+			log.info("[EventId: {}] 최대 수용 인원 도달 - 현재: {}명, 최대: {}명",
+				eventId, currentEnteredCount, maxEnteredLimit);
+			return;
+		}
+
+		//한번에 입장시킬 인원
+		int batchSize = properties.getEntry().getBatchSize();
+
+		// 입장 인원 선정
+		// 빈 자리 순차적으로 들어갈 수 있도록 함
+		int entryCount = Math.min(
+			batchSize,
+			Math.min(availableEnteredCount, totalWaitingCount.intValue())  // 빈 자리와 대기 인원 중 작은 값
+		);
+
+		log.info("입장 처리 - eventId: {}, 대기: {}명, 입장완료: {}명, 빈자리: {}명, 배치사이즈: {}명, 입장시킬인원: {}명",
+			eventId, totalWaitingCount, currentEnteredCount, availableEnteredCount, batchSize, entryCount);
+
+
+		//상위 N명 추출
+		Set<Object> topWaitingUsers = queueEntryRedisRepository.getTopWaitingUsers(eventId, entryCount);
+
+		if (topWaitingUsers.isEmpty()) {
+			return;
+		}
+
+		List<Long> userIds = new ArrayList<>();
+		for (Object userId : topWaitingUsers) {
+			userIds.add(Long.parseLong(userId.toString()));
+		}
+
+		processBatchEntry(eventId, userIds);
+
+		//이벤트 추가
+
 	}
 
 
