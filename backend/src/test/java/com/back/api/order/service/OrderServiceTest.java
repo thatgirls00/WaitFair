@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.back.api.payment.order.dto.request.OrderRequestDto;
 import com.back.api.payment.order.service.OrderService;
-import com.back.api.seat.service.SeatService;
+import com.back.api.ticket.service.TicketService;
 import com.back.domain.event.entity.Event;
 import com.back.domain.event.repository.EventRepository;
 import com.back.domain.payment.order.entity.Order;
@@ -21,6 +21,8 @@ import com.back.domain.payment.order.entity.OrderStatus;
 import com.back.domain.payment.order.repository.OrderRepository;
 import com.back.domain.seat.entity.Seat;
 import com.back.domain.seat.repository.SeatRepository;
+import com.back.domain.ticket.entity.Ticket;
+import com.back.domain.ticket.entity.TicketStatus;
 import com.back.domain.user.entity.User;
 import com.back.domain.user.repository.UserRepository;
 
@@ -44,16 +46,17 @@ class OrderServiceTest {
 	private SeatRepository seatRepository;
 
 	@Mock
-	private SeatService seatService;
+	private TicketService ticketService;
 
 	@Test
-	@DisplayName("주문 생성 성공")
+	@DisplayName("주문 생성 성공 - DRAFT 티켓을 조회하고 Order 생성 후 PAID로 변경")
 	void createOrder_Success() {
 		// given
 		Long amount = 25000L;
 		Long eventId = 7L;
 		Long userId = 5L;
 		Long seatId = 102L;
+		Long ticketId = 1L;
 
 		OrderRequestDto requestDto = new OrderRequestDto(amount, eventId, userId, seatId);
 
@@ -61,6 +64,16 @@ class OrderServiceTest {
 		User mockUser = mock(User.class);
 		Seat mockSeat = mock(Seat.class);
 
+		// Draft 티켓 Mock
+		Ticket draftTicket = Ticket.builder()
+			.id(ticketId)
+			.owner(mockUser)
+			.event(mockEvent)
+			.seat(mockSeat)
+			.ticketStatus(TicketStatus.DRAFT)
+			.build();
+
+		given(ticketService.getDraftTicket(seatId, userId)).willReturn(draftTicket);
 		given(eventRepository.getReferenceById(eventId)).willReturn(mockEvent);
 		given(userRepository.getReferenceById(userId)).willReturn(mockUser);
 		given(seatRepository.getReferenceById(seatId)).willReturn(mockSeat);
@@ -76,8 +89,8 @@ class OrderServiceTest {
 
 		given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
 
-		// confirmPurchase는 Seat을 반환
-		// given(seatService.confirmPurchase(eventId, seatId, userId)).willReturn(mockSeat);
+		// confirmPayment Mock (void 메서드이므로 willDoNothing)
+		given(ticketService.confirmPayment(ticketId, userId)).willReturn(mock(Ticket.class));
 
 		// when
 		Order result = orderService.createOrder(requestDto);
@@ -90,12 +103,13 @@ class OrderServiceTest {
 		assertThat(result.getUser()).isEqualTo(mockUser);
 		assertThat(result.getSeat()).isEqualTo(mockSeat);
 
-		// verify
+		// verify - 호출 순서 검증
+		verify(ticketService, times(1)).getDraftTicket(seatId, userId);
 		verify(eventRepository, times(1)).getReferenceById(eventId);
 		verify(userRepository, times(1)).getReferenceById(userId);
 		verify(seatRepository, times(1)).getReferenceById(seatId);
 		verify(orderRepository, times(1)).save(any(Order.class));
-		// verify(seatService, times(1)).confirmPurchase(eventId, seatId, userId);
+		verify(ticketService, times(1)).confirmPayment(ticketId, userId);
 	}
 
 	@Test
@@ -108,10 +122,21 @@ class OrderServiceTest {
 		User mockUser = mock(User.class);
 		Seat mockSeat = mock(Seat.class);
 
+		// Draft 티켓 Mock
+		Ticket draftTicket = Ticket.builder()
+			.id(1L)
+			.owner(mockUser)
+			.event(mockEvent)
+			.seat(mockSeat)
+			.ticketStatus(TicketStatus.DRAFT)
+			.build();
+
+		given(ticketService.getDraftTicket(anyLong(), anyLong())).willReturn(draftTicket);
 		given(eventRepository.getReferenceById(anyLong())).willReturn(mockEvent);
 		given(userRepository.getReferenceById(anyLong())).willReturn(mockUser);
 		given(seatRepository.getReferenceById(anyLong())).willReturn(mockSeat);
 		given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
+		given(ticketService.confirmPayment(anyLong(), anyLong())).willReturn(mock(Ticket.class));
 
 		// when
 		orderService.createOrder(requestDto);
@@ -127,27 +152,34 @@ class OrderServiceTest {
 	}
 
 	@Test
-	@DisplayName("주문 생성 후 좌석 구매 확정 서비스가 호출되는지 검증")
-	void createOrder_CallsSeatServiceConfirmPurchase() {
+	@DisplayName("주문 생성 후 티켓 결제 확정 서비스가 호출되는지 검증")
+	void createOrder_CallsTicketServiceConfirmPayment() {
 		// given
 		Long eventId = 1L;
 		Long userId = 2L;
 		Long seatId = 3L;
+		Long ticketId = 100L;
 
 		OrderRequestDto requestDto = new OrderRequestDto(10000L, eventId, userId, seatId);
 
+		// Draft 티켓 Mock
+		Ticket draftTicket = Ticket.builder()
+			.id(ticketId)
+			.ticketStatus(TicketStatus.DRAFT)
+			.build();
+
+		given(ticketService.getDraftTicket(seatId, userId)).willReturn(draftTicket);
 		given(eventRepository.getReferenceById(anyLong())).willReturn(mock(Event.class));
 		given(userRepository.getReferenceById(anyLong())).willReturn(mock(User.class));
 		given(seatRepository.getReferenceById(anyLong())).willReturn(mock(Seat.class));
 		given(orderRepository.save(any(Order.class))).willReturn(mock(Order.class));
-
-		// confirmPurchase Mock 추가
-		//given(seatService.confirmPurchase(anyLong(), anyLong(), anyLong())).willReturn(mock(Seat.class));
+		given(ticketService.confirmPayment(ticketId, userId)).willReturn(mock(Ticket.class));
 
 		// when
 		orderService.createOrder(requestDto);
 
 		// then
-		//verify(seatService, times(1)).confirmPurchase(eventId, seatId, userId);
+		verify(ticketService, times(1)).getDraftTicket(seatId, userId);
+		verify(ticketService, times(1)).confirmPayment(ticketId, userId);
 	}
 }
