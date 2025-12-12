@@ -66,16 +66,16 @@ public class QueueEntryProcessService {
 	@Transactional
 	public void processBatchEntry(Long eventId, List<Long> userIds) {
 
-		int successCount = 0;
-		int failCount = 0;
+		//int successCount = 0;
+		//int failCount = 0;
 
 		for (Long userId : userIds) {
 			try {
 				processEntry(eventId, userId);
-				successCount++;
+				//successCount++;
 			} catch (ErrorException e) {
 				log.error("eventId {} / userId {} 처리 중 오류 발생: {}", eventId, userId, e.getMessage());
-				failCount++;
+				//failCount++;
 			}
 		}
 	}
