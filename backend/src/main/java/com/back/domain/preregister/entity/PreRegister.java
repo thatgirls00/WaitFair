@@ -83,8 +83,9 @@ public class PreRegister extends BaseEntity {
 		this.preRegisterStatus = PreRegisterStatus.CANCELED;
 	}
 
-	public void restore() {
+	public void reRegister() {
 		this.preRegisterStatus = PreRegisterStatus.REGISTERED;
+		this.preRegisterAgreedAt = LocalDateTime.now();
 	}
 
 	public boolean isRegistered() {
