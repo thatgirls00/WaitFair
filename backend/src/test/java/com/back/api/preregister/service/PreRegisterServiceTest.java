@@ -25,7 +25,6 @@ import com.back.domain.preregister.entity.PreRegister;
 import com.back.domain.preregister.entity.PreRegisterStatus;
 import com.back.domain.preregister.repository.PreRegisterRepository;
 import com.back.domain.user.entity.User;
-import com.back.domain.user.entity.UserActiveStatus;
 import com.back.domain.user.entity.UserRole;
 import com.back.domain.user.repository.UserRepository;
 import com.back.global.error.code.CommonErrorCode;
@@ -635,11 +634,25 @@ class PreRegisterServiceTest {
 
 			// when: 각 사용자가 사전등록
 			preRegisterService.register(testEvent.getId(), user1.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user1.user().getNickname(), user1.rawPassword(), user1.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user1.user().getNickname(),
+					user1.rawPassword(),
+					user1.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user2.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user2.user().getNickname(), user2.rawPassword(), user2.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user2.user().getNickname(),
+					user2.rawPassword(),
+					user2.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user3.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user3.user().getNickname(), user3.rawPassword(), user3.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user3.user().getNickname(),
+					user3.rawPassword(),
+					user3.user().getBirthDate()
+				));
 
 			// then: 3명 모두 등록되어야 함
 			Long count = preRegisterService.getRegistrationCount(testEvent.getId());
@@ -709,15 +722,39 @@ class PreRegisterServiceTest {
 
 			// when: 5명 모두 등록
 			preRegisterService.register(testEvent.getId(), user1.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user1.user().getNickname(), user1.rawPassword(), user1.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user1.user().getNickname(),
+					user1.rawPassword(),
+					user1.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user2.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user2.user().getNickname(), user2.rawPassword(), user2.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user2.user().getNickname(),
+					user2.rawPassword(),
+					user2.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user3.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user3.user().getNickname(), user3.rawPassword(), user3.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user3.user().getNickname(),
+					user3.rawPassword(),
+					user3.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user4.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user4.user().getNickname(), user4.rawPassword(), user4.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user4.user().getNickname(),
+					user4.rawPassword(),
+					user4.user().getBirthDate()
+				));
+
 			preRegisterService.register(testEvent.getId(), user5.user().getId(),
-				PreRegisterRequestFactory.fakePreRegisterRequest(user5.user().getNickname(), user5.rawPassword(), user5.user().getBirthDate()));
+				PreRegisterRequestFactory.fakePreRegisterRequest(
+					user5.user().getNickname(),
+					user5.rawPassword(),
+					user5.user().getBirthDate()
+				));
 
 			// then: 5명 등록 확인
 			Long countBeforeCancel = preRegisterService.getRegistrationCount(testEvent.getId());
