@@ -10,10 +10,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.back.api.queue.dto.response.WaitingQueueBatchEventResponse;
 import com.back.api.queue.dto.response.CompletedQueueResponse;
 import com.back.api.queue.dto.response.EnteredQueueResponse;
 import com.back.api.queue.dto.response.ExpiredQueueResponse;
+import com.back.api.queue.dto.response.WaitingQueueBatchEventResponse;
 import com.back.api.queue.dto.response.WaitingQueueResponse;
 import com.back.domain.event.entity.Event;
 import com.back.domain.queue.entity.QueueEntry;

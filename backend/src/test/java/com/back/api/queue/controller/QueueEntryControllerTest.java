@@ -142,7 +142,7 @@ public class QueueEntryControllerTest {
 
 	@Nested
 	@DisplayName("대기열 진입 여부 조회 API (/api/v1/queues/{eventId}/exists")
-	class getQueueExistTest {
+	class GetQueueExistsTest {
 		@Test
 		@DisplayName("대기 중인 사용자 조회")
 		void existsInQueue_Waiting_ReturnsTrue() throws Exception {

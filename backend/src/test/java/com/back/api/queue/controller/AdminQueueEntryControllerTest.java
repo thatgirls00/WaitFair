@@ -278,6 +278,6 @@ public class AdminQueueEntryControllerTest {
 	}
 
 	// DTO record for request body
-	record ShuffleQueueRequest(List<Long> preRegisteredUserIds) {}
+	record ShuffleQueueRequest(List<Long> preRegisteredUserIds) { }
 
 }

@@ -56,7 +56,7 @@ public class QueueEntryHelper {
 		return queueEntryRepository.save(queueEntry);
 	}
 
-	 // 여러 사용자의 WAITING 상태 QueueEntry 생성 (순위 자동 할당)
+	// 여러 사용자의 WAITING 상태 QueueEntry 생성 (순위 자동 할당)
 	public List<QueueEntry> createQueueEntries(Event event, List<User> users) {
 		List<QueueEntry> queueEntries = IntStream.range(0, users.size())
 			.mapToObj(i -> QueueEntryFactory.fakeQueueEntry(event, users.get(i), i + 1))

@@ -55,28 +55,26 @@ public class SecurityConfig {
 					response.setContentType("application/json; charset=UTF-8");
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					response.getWriter().write("""
-                    {
-                        "status": "UNAUTHORIZED",
-                        "message": "로그인 후 이용해주세요.",
-                        "data": null
-                    }
-                """);
+						{
+							"status": "UNAUTHORIZED",
+							"message": "로그인 후 이용해주세요.",
+							"data": null
+						}
+						""");
 				})
 
 				.accessDeniedHandler((request, response, accessDeniedException) -> {
 					response.setContentType("application/json; charset=UTF-8");
 					response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 					response.getWriter().write("""
-                    {
-                        "status": "FORBIDDEN",
-                        "message": "접근 권한이 없습니다.",
-                        "data": null
-                    }
-                """);
+						{
+							"status": "FORBIDDEN",
+							"message": "접근 권한이 없습니다.",
+							"data": null
+						}
+						""");
 				})
 			);
-
-
 
 		http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
