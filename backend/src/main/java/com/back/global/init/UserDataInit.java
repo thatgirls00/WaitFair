@@ -27,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserDataInit implements ApplicationRunner {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
-	private final PasswordEncoder encoder;
 
 	@Override
 	public void run(ApplicationArguments args) {
@@ -43,7 +43,7 @@ public class UserDataInit implements ApplicationRunner {
 
 		User admin = User.builder()
 			.email("admin@test.com")
-			.password(encoder.encode("admin1234"))
+			.password(passwordEncoder.encode("admin1234"))
 			.nickname("admin")
 			.role(UserRole.ADMIN)
 			.birthDate(LocalDate.of(1990, 1, 1))
@@ -55,14 +55,13 @@ public class UserDataInit implements ApplicationRunner {
 		log.info("User 초기 데이터 {}명이 생성되었습니다.", users.size());
 	}
 
-
 	private List<User> createTestUsers(int count) {
 		List<User> users = new ArrayList<>();
 
 		for (int i = 1; i <= count; i++) {
 			User user = User.builder()
 				.email("test" + i + "@test.com")
-				.password(encoder.encode("abc12345"))
+				.password(passwordEncoder.encode("abc12345"))
 				.nickname("test" + i)
 				.role(UserRole.NORMAL)
 				.birthDate(LocalDate.of(2000, 1, 1))
