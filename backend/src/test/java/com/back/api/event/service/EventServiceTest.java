@@ -48,7 +48,8 @@ class EventServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		now = LocalDateTime.now();
+		LocalDateTime rawNow = LocalDateTime.now();
+		now = rawNow.withNano((rawNow.getNano() / 1000) * 1000);
 		preOpenAt = now.plusDays(1);
 		preCloseAt = now.plusDays(5);
 		ticketOpenAt = now.plusDays(6);
