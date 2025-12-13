@@ -3,8 +3,8 @@ package com.back.api.payment.payment.client;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.back.api.payment.payment.dto.PaymentConfirmCommand;
-import com.back.api.payment.payment.dto.PaymentConfirmResult;
+import com.back.api.payment.payment.dto.request.PaymentConfirmCommand;
+import com.back.api.payment.payment.dto.response.PaymentConfirmResult;
 
 @Component
 @Profile({"dev", "test"})

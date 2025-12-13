@@ -5,12 +5,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.back.api.payment.order.dto.response.OrderResponseDto;
-import com.back.api.payment.payment.dto.PaymentConfirmRequest;
+import com.back.api.payment.payment.dto.request.PaymentConfirmRequest;
+import com.back.api.payment.payment.dto.response.PaymentConfirmResponse;
 import com.back.api.payment.payment.service.PaymentService;
 import com.back.global.http.HttpRequestContext;
 import com.back.global.response.ApiResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,13 +23,17 @@ public class PaymentController {
 	private final HttpRequestContext httpRequestContext;
 
 	@PostMapping("/confirm")
-	public ApiResponse<OrderResponseDto> confirmPayment(
-		@RequestBody PaymentConfirmRequest request
+	public ApiResponse<PaymentConfirmResponse> confirmPayment(
+		@Valid @RequestBody PaymentConfirmRequest request
 	) {
 		Long userId = httpRequestContext.getUser().getId();
 
-		OrderResponseDto response =
-			paymentService.confirmPayment(request.orderId(), userId);
+		PaymentConfirmResponse response = paymentService.confirmPayment(
+			request.orderId(),
+			request.paymentKey(),
+			request.amount(),
+			userId
+		);
 
 		return ApiResponse.ok(
 			"결제가 완료되었습니다.",

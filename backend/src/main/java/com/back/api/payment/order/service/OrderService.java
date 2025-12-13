@@ -16,6 +16,8 @@ import com.back.domain.payment.order.repository.OrderRepository;
 import com.back.domain.seat.repository.SeatRepository;
 import com.back.domain.ticket.entity.Ticket;
 import com.back.domain.user.repository.UserRepository;
+import com.back.global.error.code.OrderErrorCode;
+import com.back.global.error.exception.ErrorException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,16 @@ public class OrderService {
 
 		// 티켓이 DRAFT 상태인지 확인
 		Ticket draft = ticketService.getDraftTicket(orderRequestDto.seatId(), userId);
+
+		if (!draft.getEvent().getId().equals(orderRequestDto.eventId())) {
+			throw new ErrorException(OrderErrorCode.TICKET_EVENT_MISMATCH);
+		}
+
+		Integer actualAmount = draft.getSeat().getPrice();
+
+		if (!orderRequestDto.amount().equals(actualAmount.longValue())) {
+			throw new ErrorException(OrderErrorCode.AMOUNT_MISMATCH);
+		}
 
 		// 주문 생성
 		Order newOrder = Order.builder()

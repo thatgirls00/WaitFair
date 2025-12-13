@@ -1,4 +1,4 @@
-package com.back.api.payment.payment.dto;
+package com.back.api.payment.payment.dto.response;
 
 public record PaymentConfirmResult(
 	String paymentKey,
