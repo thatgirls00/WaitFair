@@ -1,6 +1,7 @@
 package com.back.api.preregister.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,9 +47,23 @@ public class PreRegisterService {
 		// 약관 동의 검증
 		validateAgreements(request);
 
-		// 중복 등록 방지 (1인 1계정) - 본인 인증 통과 후 검사
-		validateDuplicateRegistration(eventId, userId);
+		// 기존 사전등록 확인 (CANCELED 상태면 재활용)
+		Optional<PreRegister> existingPreRegister = preRegisterRepository.findByEvent_IdAndUser_Id(eventId, userId);
 
+		if (existingPreRegister.isPresent()) {
+			PreRegister preRegister = existingPreRegister.get();
+
+			// REGISTERED 상태면 중복 등록 예외
+			if (preRegister.isRegistered()) {
+				throw new ErrorException(PreRegisterErrorCode.ALREADY_PRE_REGISTERED);
+			}
+
+			// CANCELED 상태면 재등록 (상태만 변경)
+			preRegister.reRegister();
+			return PreRegisterResponse.from(preRegister);
+		}
+
+		// 새로운 사전등록 생성
 		PreRegister preRegister = PreRegister.builder()
 			.event(event)
 			.user(user)
@@ -106,12 +121,6 @@ public class PreRegisterService {
 		LocalDateTime now = LocalDateTime.now();
 		if (now.isBefore(event.getPreOpenAt()) || now.isAfter(event.getPreCloseAt())) {
 			throw new ErrorException(PreRegisterErrorCode.INVALID_PRE_REGISTRATION_PERIOD);
-		}
-	}
-
-	private void validateDuplicateRegistration(Long eventId, Long userId) {
-		if (preRegisterRepository.existsByEvent_IdAndUser_Id(eventId, userId)) {
-			throw new ErrorException(PreRegisterErrorCode.ALREADY_PRE_REGISTERED);
 		}
 	}
 
