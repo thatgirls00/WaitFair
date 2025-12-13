@@ -79,12 +79,19 @@ public class TicketService {
 	 * 진행 중인 Draft Ticket 조회
 	 */
 	@Transactional(readOnly = true)
-	public Ticket getDraftTicket(Long seatId, Long userId) {
-		return ticketRepository.findBySeatIdAndOwnerIdAndTicketStatus(
+	public Ticket getDraftTicket(Long eventId, Long seatId, Long userId) {
+		Ticket ticket = ticketRepository.findBySeatIdAndOwnerIdAndTicketStatus(
 			seatId,
 			userId,
 			TicketStatus.DRAFT
 		).orElseThrow(() -> new ErrorException(TicketErrorCode.TICKET_NOT_IN_PROGRESS));
+
+		// 티켓이 해당 이벤트에 속하는지 검증
+		if (!ticket.getEvent().getId().equals(eventId)) {
+			throw new ErrorException(TicketErrorCode.TICKET_EVENT_MISMATCH);
+		}
+
+		return ticket;
 	}
 
 	/**
@@ -145,5 +152,17 @@ public class TicketService {
 		}
 
 		return ticket;
+	}
+
+	/**
+	 * 사용자가 이미 해당 이벤트에 대해 좌석을 선택(임시/발급완료 된 티켓이 존재)했는지 확인
+	 */
+	@Transactional(readOnly = true)
+	public boolean hasUserAlreadySelectedSeat(Long eventId, Long userId) {
+		return ticketRepository.existsByEventIdAndOwnerIdAndTicketStatusIn(
+			eventId,
+			userId,
+			List.of(TicketStatus.DRAFT, TicketStatus.PAID, TicketStatus.ISSUED)
+		);
 	}
 }
