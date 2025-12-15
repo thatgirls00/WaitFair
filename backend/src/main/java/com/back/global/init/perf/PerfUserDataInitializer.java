@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,21 +20,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Profile("perf")
-public class PerfUserDataInitializer implements ApplicationRunner {
+public class PerfUserDataInitializer {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	@Override
-	public void run(ApplicationArguments args) {
+	public void init(int userCount) {
 		if (userRepository.count() > 0) {
 			log.info("User 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
 			return;
 		}
 
-		log.info("User 초기 데이터를 생성합니다.");
+		log.info("User 초기 데이터 생성 중: {}명", userCount);
 
-		List<User> users = createTestUsers(150);
+		List<User> users = createTestUsers(userCount);
 
 		User admin = User.builder()
 			.email("admin@test.com")
@@ -50,7 +47,7 @@ public class PerfUserDataInitializer implements ApplicationRunner {
 
 		userRepository.save(admin);
 
-		log.info("User 초기 데이터 {}명이 생성되었습니다.", users.size());
+		log.info("✅ User 데이터 생성 완료: 일반 사용자 {}명 + 관리자 1명", users.size());
 	}
 
 	private List<User> createTestUsers(int count) {
@@ -71,5 +68,4 @@ public class PerfUserDataInitializer implements ApplicationRunner {
 
 		return userRepository.saveAll(users);
 	}
-
 }
