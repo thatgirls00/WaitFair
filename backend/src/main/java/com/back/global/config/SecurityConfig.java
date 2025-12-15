@@ -1,10 +1,13 @@
-package com.back.global.config.security;
+package com.back.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -92,5 +95,12 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 
 		return source;
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder(
+		@Value("${security.password.bcrypt-strength}") int strength
+	) {
+		return new BCryptPasswordEncoder(strength);
 	}
 }
