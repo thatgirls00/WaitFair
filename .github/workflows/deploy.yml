@@ -55,6 +55,7 @@ jobs:
       - uses: actions/checkout@v4
 
       #환경 변수
+      #도플러 변경 예정
       - name: application-secret 추가
         env:
           ACTIONS_STEP_DEBUG: true
@@ -101,12 +102,14 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: 인스턴스 ID 가져오기
         id: get_instance_id
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=dev-ec2-1" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
           echo $INSTANCE_ID
+
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm
@@ -118,6 +121,7 @@ jobs:
           working-directory: /
           comment: Deploy
           command: |
+          
             # 공통 변수
             IMAGE="ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest"
             NETWORK="common"
