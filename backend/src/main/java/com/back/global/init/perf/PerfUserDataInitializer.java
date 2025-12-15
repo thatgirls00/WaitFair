@@ -1,4 +1,4 @@
-package com.back.global.init;
+package com.back.global.init.perf;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Profile("perf")
-public class PerfDataInitializer implements ApplicationRunner {
+public class PerfUserDataInitializer implements ApplicationRunner {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -71,4 +71,5 @@ public class PerfDataInitializer implements ApplicationRunner {
 
 		return userRepository.saveAll(users);
 	}
+
 }
