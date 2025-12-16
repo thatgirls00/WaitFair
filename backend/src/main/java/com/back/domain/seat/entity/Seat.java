@@ -99,6 +99,28 @@ public class Seat extends BaseEntity {
 		return seat;
 	}
 
+	/**
+	 * 테스트 데이터 생성용 좌석 생성 (상태 전이 없이 바로 SOLD)
+	 * 실제 비즈니스 로직을 거치지 않고 테스트 데이터를 생성하기 위한 전용 메서드
+	 */
+	public static Seat soldForPerf(Event event, String seatCode, SeatGrade grade, int price) {
+		Seat seat = new Seat();
+		seat.event = event;
+		seat.seatCode = seatCode;
+		seat.grade = grade;
+		seat.price = price;
+		seat.seatStatus = SeatStatus.SOLD;
+		return seat;
+	}
+
+	/**
+	 * 테스트 데이터 생성용 좌석 상태 직접 설정
+	 * 상태 전이 검증 없이 바로 원하는 상태로 변경
+	 */
+	public void setSeatStatusForPerf(SeatStatus status) {
+		this.seatStatus = status;
+	}
+
 	public void update(String seatCode, SeatGrade grade, int price, SeatStatus seatStatus) {
 		this.seatCode = seatCode;
 		this.grade = grade;

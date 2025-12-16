@@ -1,5 +1,6 @@
 package com.back.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -97,7 +98,9 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(12);
+	public PasswordEncoder passwordEncoder(
+		@Value("${security.password.bcrypt-strength}") int strength
+	) {
+		return new BCryptPasswordEncoder(strength);
 	}
 }

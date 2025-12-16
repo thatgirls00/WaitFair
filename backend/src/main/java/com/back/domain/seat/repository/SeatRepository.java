@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.back.domain.seat.entity.Seat;
 import com.back.domain.seat.entity.SeatGrade;
+import com.back.domain.seat.entity.SeatStatus;
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
@@ -22,6 +23,9 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 	List<Seat> findSortedSeatListByEventId(Long eventId);
 
 	Optional<Seat> findByEventIdAndId(Long eventId, Long seatId);
+
+	// 특정 이벤트의 특정 상태 좌석 조회 (성능 최적화)
+	List<Seat> findByEventIdAndSeatStatus(Long eventId, SeatStatus seatStatus);
 
 	@Modifying
 	@Query("DELETE FROM Seat s WHERE s.event.id = :eventId")

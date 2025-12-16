@@ -74,6 +74,20 @@ public class Ticket extends BaseEntity {
 		return ticket;
 	}
 
+	/**
+	 * 테스트 데이터 생성용 티켓 생성 (상태 전이 없이 바로 ISSUED)
+	 * 실제 비즈니스 로직을 거치지 않고 테스트 데이터를 생성하기 위한 전용 메서드
+	 */
+	public static Ticket issuedForPerf(User owner, Seat seat, Event event) {
+		Ticket ticket = new Ticket();
+		ticket.owner = owner;
+		ticket.seat = seat;
+		ticket.event = event;
+		ticket.ticketStatus = TicketStatus.ISSUED;
+		ticket.issuedAt = LocalDateTime.now();
+		return ticket;
+	}
+
 	// DRAFT → PAID
 	public void markPaid() {
 		if (this.ticketStatus != TicketStatus.DRAFT) {
