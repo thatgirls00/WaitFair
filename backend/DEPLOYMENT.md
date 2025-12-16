@@ -1,6 +1,56 @@
 # 운영 환경 배포 가이드
 
-## 필수 환경변수
+## 환경변수 관리 (Doppler)
+
+이 프로젝트는 **Doppler**를 사용하여 환경변수를 관리합니다.
+
+### 로컬 개발 설정
+
+1. **Doppler CLI 설치**
+   ```bash
+   # Windows (PowerShell)
+   iwr "https://cli.doppler.com/install.ps1" -useb | iex
+   
+   # macOS
+   brew install dopplerhq/cli/doppler
+   
+   # Linux
+   curl -sLf https://cli.doppler.com/install.sh | sh
+   ```
+
+2. **Doppler 로그인**
+   ```bash
+   doppler login
+   ```
+
+3. **프로젝트 설정** (backend 디렉토리에서)
+   ```bash
+   cd backend
+   doppler setup --project waitfair --config dev
+   ```
+
+4. **애플리케이션 실행**
+   ```bash
+   doppler run -- ./gradlew bootRun
+   ```
+
+### 팀원 초대
+
+팀 리더에게 Doppler 계정 초대를 요청하세요.
+초대받은 이메일로 로그인하면 모든 환경변수에 자동으로 접근 가능합니다.
+
+### 환경변수 목록
+
+Doppler에서 관리하는 환경변수:
+- `DB_USER`, `DB_PASSWORD` (로컬 개발용)
+- `SUPABASE_URL`, `SUPABASE_USERNAME`, `SUPABASE_PASSWORD` (운영용)
+- `JWT_SECRET`, `JWT_ACCESS_TOKEN_DURATION`, `JWT_REFRESH_TOKEN_DURATION`
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
+- `API_BASE_URL`, `FRONTEND_URL`, `BACKEND_URL`
+
+---
+
+## 필수 환경변수 (참고용)
 
 prod 프로필로 실행하기 위해 다음 환경변수들을 설정해야 합니다:
 

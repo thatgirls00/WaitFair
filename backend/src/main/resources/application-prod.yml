@@ -3,6 +3,21 @@ spring:
     activate:
       on-profile: prod
 
+  datasource:
+    url: ${SUPABASE_URL}
+    username: ${SUPABASE_USERNAME}
+    password: ${SUPABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      data-source-properties:
+        prepareThreshold: 0
+        cachePrepStmts: false
+        useServerPrepStmts: false
+
   jpa:
     hibernate:
       ddl-auto: validate  # 운영에서는 validate만 사용
@@ -11,7 +26,7 @@ spring:
       hibernate:
         format_sql: false
         use_sql_comments: false
-      show-sql: false # 이거 없으면 aws 세션에서 확인할 때 쿼리 로그 뜸
+      show-sql: false
 
   data:
     redis:
@@ -42,14 +57,6 @@ custom:
       - ${BACKEND_URL}
       - http://localhost:3000
       - http://localhost:5173 # 프론트 배포 후 제거
-    allowed-methods:
-      - GET
-      - POST
-      - PUT
-      - DELETE
-      - OPTIONS
-    allowed-headers:
-      - "*"
 
 # Actuator 설정 (최소한의 엔드포인트만 노출)
 management:
