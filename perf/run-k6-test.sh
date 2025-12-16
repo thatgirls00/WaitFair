@@ -9,13 +9,18 @@ if [ -f "$ENV_FILE" ]; then
   export $(grep -v '^#' "$ENV_FILE" | xargs)
 fi
 
+# Helper: "_" 또는 빈 값을 기본값으로 처리
+default_if_empty() {
+  [[ "$1" == "_" || -z "$1" ]] && echo "$2" || echo "$1"
+}
+
 # Args
-SCENARIO=${1:-loadtest.js}
-VUS=${2:-10}
-DURATION=${3:-10s}
-BASE_URL=${4:-http://host.docker.internal:8080}
-RAMP_UP_VUS=${5:-50}
-PEAK_VUS=${6:-100}
+SCENARIO=$(default_if_empty "$1" "loadtest.js")
+VUS=$(default_if_empty "$2" "10")
+DURATION=$(default_if_empty "$3" "10s")
+BASE_URL=$(default_if_empty "$4" "http://host.docker.internal:8080")
+RAMP_UP_VUS=$(default_if_empty "$5" "50")
+PEAK_VUS=$(default_if_empty "$6" "100")
 
 # Test naming
 TEST_RAW=$(basename "$SCENARIO" .js)          # e.g. getRoom.test
