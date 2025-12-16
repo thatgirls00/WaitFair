@@ -80,7 +80,7 @@ jobs:
 
       - name: export image name
         id: export_image
-        run: echo "image_name=app251127" >> $GITHUB_OUTPUT
+        run: echo "image_name=WEB7_9_TxI_BE" >> $GITHUB_OUTPUT
 
       - name: 빌드 앤 푸시
         uses: docker/build-push-action@v3
@@ -92,6 +92,8 @@ jobs:
           tags: |
             ghcr.io/${{ steps.export_owner.outputs.owner_lc }}/${{ steps.export_image.outputs.image_name }}:${{ needs.makeTagAndRelease.outputs.tag_name }},
             ghcr.io/${{ steps.export_owner.outputs.owner_lc }}/${{ steps.export_image.outputs.image_name }}:latest
+
+        
 
   deploy:
     runs-on: ubuntu-latest
