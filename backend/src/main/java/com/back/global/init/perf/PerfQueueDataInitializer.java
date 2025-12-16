@@ -79,6 +79,10 @@ public class PerfQueueDataInitializer {
 
 				int queueCount = (int) (users.size() * queueRatio);
 				List<QueueEntry> queueEntries = createQueueEntriesForEvent(event3, users, queueCount);
+
+				// Event #3는 ENTERED 상태로 설정
+				queueEntries.forEach(QueueEntry::enterQueue);
+
 				queueEntryRepository.saveAll(queueEntries);
 
 				// Redis ENTERED 큐에 추가 (대기열을 통과한 상태)
