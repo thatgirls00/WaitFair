@@ -40,6 +40,8 @@ custom:
     allowed-origins:
       - ${FRONTEND_URL}
       - ${BACKEND_URL}
+      - http://localhost:3000
+      - http://localhost:5173 # 프론트 배포 후 제거
     allowed-methods:
       - GET
       - POST
