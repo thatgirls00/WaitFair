@@ -79,6 +79,8 @@ jobs:
         with:
           context: ./backend
           push: true
+          build-args: |
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN }}
           cache-from: type=registry,ref=ghcr.io/${{ steps.export_owner.outputs.owner_lc }}/${{ steps.export_image.outputs.image_name }}:cache
           cache-to: type=registry,ref=ghcr.io/${{ steps.export_owner.outputs.owner_lc }}/${{ steps.export_image.outputs.image_name }}:cache,mode=max
           tags: |
@@ -114,24 +116,10 @@ jobs:
           working-directory: /
           comment: Deploy
           command: |
-            if ! command -v doppler &> /dev/null; then
-              echo "Installing Doppler CLI..."
-              curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg && \
-              echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list && \
-              sudo apt-get update && \
-              sudo apt-get -y install doppler
-            fi
-            
             docker pull ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest && \
             docker stop app1 2>/dev/null || true && \
             docker rm app1 2>/dev/null || true && \
-            
-            export DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN }}" && \
-            doppler secrets download --project waitfair --config prd --format env --no-file > /tmp/doppler.env && \
-            unset DOPPLER_TOKEN && \
-            
-            docker run -d --name app1 --network common -p 8080:8080 \
-              --env-file /tmp/doppler.env \
+             docker run -d --name app1 --network common -p 8080:8080 \
+              -e DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN }} \
               ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest && \
-            rm /tmp/doppler.env && \
-            docker image prune -f    
+            docker image prune -f          
