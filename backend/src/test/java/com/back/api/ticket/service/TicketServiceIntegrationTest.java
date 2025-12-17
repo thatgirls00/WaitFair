@@ -87,7 +87,13 @@ class TicketServiceIntegrationTest {
 		Ticket secondCall = ticketService.getOrCreateDraft(event.getId(), user.getId());
 
 		assertThat(secondCall.getId()).isEqualTo(firstId);  // 같은 티켓 반환
-		assertThat(ticketRepository.count()).isEqualTo(1);  // 티켓 1개만 존재
+
+		// 해당 이벤트/유저의 Draft Ticket이 1개만 존재하는지 검증
+		long draftCount = ticketRepository.findByOwnerId(user.getId()).stream()
+			.filter(t -> t.getEvent().getId().equals(event.getId()))
+			.filter(t -> t.getTicketStatus() == TicketStatus.DRAFT)
+			.count();
+		assertThat(draftCount).isEqualTo(1);
 	}
 
 	@Test
