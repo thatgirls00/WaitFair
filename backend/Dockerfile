@@ -39,9 +39,9 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 # 실행할 JAR 파일 지정
-#ENTRYPOINT ["doppler", "run", "--project", "waitfair", "--config", "prd", "--", "java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
-# 임시 shell 형식으로 변경
-ENTRYPOINT ["/bin/sh", "-c", "doppler secrets download --project waitfair --config prd --format env --no-file > /tmp/.env && set -a && . /tmp/.env && exec java -jar -Dspring.profiles.active=prod app.jar"]
+ENTRYPOINT ["doppler", "run", "--project", "waitfair", "--config", "prd", "--", "java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
+
+
 
 
 ## 1단계: Gradle로 Spring Boot JAR 빌드
