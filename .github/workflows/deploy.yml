@@ -114,10 +114,17 @@ jobs:
           working-directory: /
           comment: Deploy
           command: |
-            curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg && \
-                        echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list && \
-                        sudo apt-get update && \
-                        sudo apt-get -y install doppler && \
+            if ! command -v doppler &> /dev/null
+                        then
+                            echo "Doppler CLI not found. Installing now..."
+                            # (Debian/Ubuntu 기준 설치 명령어)
+                            curl -sLf --retry 3 --tlsv1.2 --proto "=https" '...' | sudo gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg && \
+                            echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list && \
+                            sudo apt-get update && \
+                            sudo apt-get -y install doppler
+            else
+               echo "Doppler CLI is already installed."
+            fi && \
 
             export DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN }}" && \
             docker pull ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest && \
@@ -130,6 +137,5 @@ jobs:
              docker run -d --name app1 --network common -p 8080:8080 \
               ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest && \
             
-            # 5. 토큰 삭제 및 이미지 정리
             unset DOPPLER_TOKEN && \
             docker image prune -f          
