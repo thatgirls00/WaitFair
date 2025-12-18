@@ -22,7 +22,6 @@ public interface NotificationApi {
 		"NOTIFICATION_ACCESS_DENIED"
 	})
 	ApiResponse<List<NotificationResponseDto>> getNotifications(
-		@AuthenticationPrincipal SecurityUser securityUser
 	);
 
 	@Operation(summary = "읽지 않은 알림 개수 조회", description = "웹소켓이 연결된 직후 초기 데이터 로딩을 위해 이용됩니다")
@@ -30,7 +29,6 @@ public interface NotificationApi {
 		"NOTIFICATION_ACCESS_DENIED"
 	})
 	ApiResponse<UnreadCountResponseDto> getUnreadCount(
-		@AuthenticationPrincipal SecurityUser securityUser
 	);
 
 	@Operation(summary = "단일 알림 읽음 처리")
@@ -40,7 +38,6 @@ public interface NotificationApi {
 		"NOTIFICATION_PROCESS_FAILED"
 	})
 	ApiResponse<Void> markAsRead(
-		@AuthenticationPrincipal SecurityUser securityUser,
 		@PathVariable Long notificationId
 	);
 
@@ -51,6 +48,5 @@ public interface NotificationApi {
 		"NOTIFICATION_PROCESS_FAILED"
 	})
 	ApiResponse<Void> markAllAsRead(
-		@AuthenticationPrincipal SecurityUser securityUser
 	);
 }

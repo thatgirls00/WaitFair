@@ -137,7 +137,7 @@ class NotificationEventListenerTest {
 				Notification saved = notifications.get(0);
 				assertThat(saved.getType()).isEqualTo(NotificationTypes.PAYMENT);
 				assertThat(saved.getTypeDetail()).isEqualTo(NotificationTypeDetails.PAYMENT_SUCCESS);
-				assertThat(saved.getFromWhere()).isEqualTo(DomainName.ORDERS);
+				assertThat(saved.getDomainName()).isEqualTo(DomainName.ORDERS);
 				assertThat(saved.getTitle()).isEqualTo("주문 및 결제 완료");
 				assertThat(saved.getMessage()).contains("테스트 이벤트", "99000원");
 				assertThat(saved.isRead()).isFalse();
@@ -208,8 +208,8 @@ class NotificationEventListenerTest {
 				Notification saved = notifications.get(0);
 				assertThat(saved.getType()).isEqualTo(NotificationTypes.PAYMENT);
 				assertThat(saved.getTypeDetail()).isEqualTo(NotificationTypeDetails.PAYMENT_SUCCESS);
-				assertThat(saved.getFromWhere()).isEqualTo(DomainName.ORDERS);
-				assertThat(saved.getWhereId()).isEqualTo(1L);
+				assertThat(saved.getDomainName()).isEqualTo(DomainName.ORDERS);
+				assertThat(saved.getDomainId()).isEqualTo(1L);
 			});
 		}
 	}
@@ -278,7 +278,7 @@ class NotificationEventListenerTest {
 				Notification saved = notifications.get(0);
 				assertThat(saved.getType()).isEqualTo(NotificationTypes.PAYMENT);
 				assertThat(saved.getTypeDetail()).isEqualTo(NotificationTypeDetails.PAYMENT_FAILED);
-				assertThat(saved.getFromWhere()).isEqualTo(DomainName.ORDERS);
+				assertThat(saved.getDomainName()).isEqualTo(DomainName.ORDERS);
 			});
 		}
 	}
@@ -345,7 +345,7 @@ class NotificationEventListenerTest {
 				Notification saved = notifications.get(0);
 				assertThat(saved.getType()).isEqualTo(NotificationTypes.PRE_REGISTER);
 				assertThat(saved.getTypeDetail()).isEqualTo(NotificationTypeDetails.PRE_REGISTER_DONE);
-				assertThat(saved.getFromWhere()).isEqualTo(DomainName.PRE_REGISTER);
+				assertThat(saved.getDomainName()).isEqualTo(DomainName.PRE_REGISTER);
 			});
 		}
 	}
@@ -412,7 +412,7 @@ class NotificationEventListenerTest {
 				Notification saved = notifications.get(0);
 				assertThat(saved.getType()).isEqualTo(NotificationTypes.QUEUE_ENTRIES);
 				assertThat(saved.getTypeDetail()).isEqualTo(NotificationTypeDetails.TICKETING_POSSIBLE);
-				assertThat(saved.getFromWhere()).isEqualTo(DomainName.QUEUE_ENTRIES);
+				assertThat(saved.getDomainName()).isEqualTo(DomainName.QUEUE_ENTRIES);
 			});
 		}
 	}

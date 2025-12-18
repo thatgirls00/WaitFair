@@ -4,6 +4,7 @@ package com.back.domain.notification.enums;
 public enum NotificationTypeDetails {
 	// QueueEntries
 	TICKETING_POSSIBLE,          // 대기열 순서 완료
+	TICKETING_EXPIRED, 			 // 대기열 만료
 
 	// PAYMENT
 	PAYMENT_SUCCESS,

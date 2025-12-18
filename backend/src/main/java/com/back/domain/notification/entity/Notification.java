@@ -59,10 +59,10 @@ public class Notification extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private DomainName fromWhere;
+	private DomainName domainName;
 
 	@Column(nullable = true)
-	private Long whereId;
+	private Long domainId;
 
 	//연관 필드
 	@ManyToOne(fetch = FetchType.LAZY) // -> 리팩토링 고민요소
