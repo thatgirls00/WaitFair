@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.api.queue.dto.response.CompletedQueueResponse;
 import com.back.api.queue.dto.response.EnteredQueueResponse;
 import com.back.api.queue.dto.response.ExpiredQueueResponse;
+import com.back.api.queue.dto.response.ProcessEntriesResponse;
 import com.back.api.queue.dto.response.WaitingQueueBatchEventResponse;
 import com.back.api.queue.dto.response.WaitingQueueResponse;
 import com.back.domain.event.entity.Event;
@@ -23,6 +24,7 @@ import com.back.domain.queue.entity.QueueEntry;
 import com.back.domain.queue.entity.QueueEntryStatus;
 import com.back.domain.queue.repository.QueueEntryRedisRepository;
 import com.back.domain.queue.repository.QueueEntryRepository;
+import com.back.global.error.code.EventErrorCode;
 import com.back.global.error.code.QueueEntryErrorCode;
 import com.back.global.error.exception.ErrorException;
 import com.back.global.event.EventPublisher;
@@ -154,6 +156,40 @@ public class QueueEntryProcessService {
 			.findByEvent_IdAndUser_Id(eventId, userId)
 			.map(entry -> entry.getQueueEntryStatus() == QueueEntryStatus.WAITING)
 			.orElse(false);
+	}
+
+	/* ==================== 테스트용 상위 N명 입장 처리 ==================== */
+	@Transactional
+	public ProcessEntriesResponse processTopEntriesForTest(Long eventId, int count) {
+
+		Event event = eventRepository.findById(eventId)
+			.orElseThrow(() -> new ErrorException(EventErrorCode.NOT_FOUND_EVENT));
+
+		Long totalWaitingCount = queueEntryRedisRepository.getTotalWaitingCount(eventId);
+
+		if(totalWaitingCount == 0) {
+			return ProcessEntriesResponse.from(eventId, 0, 0L);
+		}
+
+		int actualCount = Math.min(count, totalWaitingCount.intValue());
+
+		Set<Object> topWaitingUsers = queueEntryRedisRepository.getTopWaitingUsers(eventId, actualCount);
+
+		if(topWaitingUsers.isEmpty()) {
+			throw new ErrorException(QueueEntryErrorCode.NOT_INVALID_COUNT);
+		}
+
+		List<Long> userIds = new ArrayList<>();
+
+		for(Object userId : topWaitingUsers) {
+			userIds.add(Long.parseLong(userId.toString()));
+		}
+
+		processBatchEntry(eventId, userIds);
+		publishWaitingUpdateEvents(eventId);
+
+		Long remainingCount = queueEntryRedisRepository.getTotalWaitingCount(eventId);
+		return ProcessEntriesResponse.from(eventId, userIds.size(), remainingCount);
 	}
 
 	/* ==================== 만료 처리 ==================== */
