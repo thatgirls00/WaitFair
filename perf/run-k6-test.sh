@@ -9,13 +9,18 @@ if [ -f "$ENV_FILE" ]; then
   export $(grep -v '^#' "$ENV_FILE" | xargs)
 fi
 
+# Helper: "_" 또는 빈 값을 기본값으로 처리
+default_if_empty() {
+  [[ "$1" == "_" || -z "$1" ]] && echo "$2" || echo "$1"
+}
+
 # Args
-SCENARIO=${1:-loadtest.js}
-VUS=${2:-10}
-DURATION=${3:-10s}
-ROOM_ID=${4:-1}
-BASE_URL=${5:-http://host.docker.internal:8080}
-ENABLE_LOG=${6:-true}
+SCENARIO=$(default_if_empty "$1" "loadtest.js")
+VUS=$(default_if_empty "$2" "10")
+DURATION=$(default_if_empty "$3" "10s")
+BASE_URL=$(default_if_empty "$4" "http://host.docker.internal:8080")
+RAMP_UP_VUS=$(default_if_empty "$5" "50")
+PEAK_VUS=$(default_if_empty "$6" "100")
 
 # Test naming
 TEST_RAW=$(basename "$SCENARIO" .js)          # e.g. getRoom.test
@@ -32,10 +37,12 @@ CSV_DIR="$RESULT_DIR/csv"
 mkdir -p "$LOG_DIR" "$REPORT_DIR" "$CSV_DIR"
 
 echo "🚀 Starting K6 load test"
-echo "   • Scenario : $SCENARIO"
-echo "   • VUS      : $VUS"
-echo "   • Duration : $DURATION"
-echo "   • Output   : $RESULT_DIR"
+echo "   • Scenario    : $SCENARIO"
+echo "   • VUS         : $VUS"
+echo "   • Duration    : $DURATION"
+echo "   • Ramp-up VUS : $RAMP_UP_VUS"
+echo "   • Peak VUS    : $PEAK_VUS"
+echo "   • Output      : $RESULT_DIR"
 echo "---------------------------------------------"
 
 # Run test inside Docker
@@ -45,9 +52,9 @@ docker compose run --rm -T \
   -e JWT_SECRET="$JWT_SECRET" \
   -e VUS="$VUS" \
   -e DURATION="$DURATION" \
-  -e ROOM_ID="$ROOM_ID" \
   -e BASE_URL="$BASE_URL" \
-  -e ENABLE_LOG="$ENABLE_LOG" \
+  -e RAMP_UP_VUS="$RAMP_UP_VUS" \
+  -e PEAK_VUS="$PEAK_VUS" \
   -e K6_PROMETHEUS_RW_SERVER_URL="http://prometheus:9090/api/v1/write" \
   k6 run \
     --summary-trend-stats="avg,min,max,p(90),p(95),p(99)" \
@@ -55,7 +62,7 @@ docker compose run --rm -T \
     --out "csv=/scripts/results/${TEST_DATE}-${TEST_NAME}/csv/k6_metrics_${TEST_NAME}_${TEST_DATE}_${TEST_ID}.csv" \
     -o experimental-prometheus-rw \
     /scripts/k6-scripts/tests/${SCENARIO} \
-    | tee "${LOG_DIR}/k6_${TEST_NAME}_${VUS}vus_${DURATION}_${TEST_DATE}_${TEST_ID}.log"
+    | tee "${LOG_DIR}/k6_${TEST_NAME}_${TEST_DATE}_${TEST_ID}.log"
 
 echo ""
 echo "✅ Test completed!"

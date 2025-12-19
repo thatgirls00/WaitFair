@@ -11,7 +11,7 @@ import { check } from "k6";
  * @param {string} password - 로그인 비밀번호
  */
 export function login(baseUrl, testId, email, password) {
-  const url = `${baseUrl}/api/v1/auth/local/login`;
+  const url = `${baseUrl}/api/v1/auth/login`;
 
   const payload = JSON.stringify({
     email,
@@ -41,12 +41,24 @@ export function login(baseUrl, testId, email, password) {
 
   const data = json?.data ?? null;
 
+  // 디버깅: status가 201이 아닌 경우 응답 출력
+  if (res.status !== 201) {
+    console.error(`❌ Login failed [${res.status}]:`, JSON.stringify({
+      status: res.status,
+      message: json?.message,
+      data: json?.data,
+      email: email,
+    }));
+  }
+
   check(res, {
-    "status 200": (r) => r.status === 200,
+    "status 201": (r) => r.status === 201,
     "data exists": () => data !== null,
-    "has accessToken": () => typeof data?.accessToken === "string",
-    "has refreshToken": () => typeof data?.refreshToken === "string",
-    "has userId": () => typeof data?.userId === "number",
+    "has tokens": () => data?.tokens !== null && typeof data?.tokens === "object",
+    "has accessToken": () => typeof data?.tokens?.accessToken === "string",
+    "has refreshToken": () => typeof data?.tokens?.refreshToken === "string",
+    "has user": () => data?.user !== null && typeof data?.user === "object",
+    "has userId": () => typeof data?.user?.userId === "number",
   });
 
   return res;

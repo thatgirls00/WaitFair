@@ -1,4 +1,4 @@
-import { login } from "../scenarios/login.js";
+import { getEvent } from "../scenarios/getEvent.js";
 import { sleep } from "k6";
 
 export const options = {
@@ -12,20 +12,13 @@ export const options = {
 };
 
 /**
- * Perf 더미데이터 규칙: PerfDataInitializer
- * - email: test{i+1}@test.com
- * - password: abc12345 <- 통일
- *
- * 기존 부하테스트와 동일하게 VU 기반으로 사용자 선택
+ * 이벤트 단건 조회 부하 테스트
+ * - 인증 불필요 (공개 API)
+ * - 랜덤 eventId 조회로 다양한 이벤트 상세 페이지 조회 시뮬레이션
+ * - 사용자가 목록에서 특정 이벤트를 클릭해서 상세 페이지를 보는 패턴
  */
 export function setup() {
-  const users = Array.from({ length: 500 }, (_, i) => ({
-    email: `test${i + 1}@test.com`,
-    password: `abc12345`,
-  }));
-
   return {
-    users,
     testId: new Date().toISOString().replace(/[:.]/g, "-"),
   };
 }
@@ -33,10 +26,13 @@ export function setup() {
 export default function (data) {
   const baseUrl = __ENV.BASE_URL || "http://host.docker.internal:8080";
 
-  // 1~500 사이 로그인 계정 라운드로빈
-  const idx = ((__VU - 1) % 500);
-  const { email, password } = data.users[idx];
+  // 랜덤 이벤트 조회 (1~10 범위)
+  // 실제 환경에 맞게 EVENT_ID_RANGE 환경변수로 조정
+  const maxEventId = parseInt(__ENV.EVENT_ID_RANGE || "10", 10);
+  const eventId = Math.floor(Math.random() * maxEventId) + 1;
 
-  login(baseUrl, data.testId, email, password);
-  sleep(1); // 1초 대기
+  getEvent(baseUrl, data.testId, eventId);
+
+  // 사용자가 이벤트 상세 페이지를 보는 시간 시뮬레이션
+  sleep(1);
 }
