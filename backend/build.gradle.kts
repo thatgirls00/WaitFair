@@ -69,6 +69,14 @@ dependencies {
 
     //coolsms
     implementation("net.nurigo:sdk:4.3.0")
+
+    //querydsl
+    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:5.1.0:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+
 }
 
 tasks.withType<Test> {
@@ -278,4 +286,30 @@ tasks.jacocoTestReport {
             }
         )
     )
+}
+
+// ============== querydsl ==============
+val querydslDir = "src/main/generated"
+
+sourceSets {
+    main {
+        java {
+            srcDirs(querydslDir)
+        }
+    }
+}
+
+tasks.withType<JavaCompile> {
+    options.generatedSourceOutputDirectory.set(file(querydslDir))
+}
+
+tasks.named("clean") {
+    doLast {
+        file(querydslDir).deleteRecursively()
+    }
+}
+
+//checkstyleMain은 compileTestJava 이후에 실행
+tasks.named<org.gradle.api.plugins.quality.Checkstyle>("checkstyleMain") {
+    dependsOn(tasks.named("compileTestJava"))
 }
