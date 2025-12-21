@@ -63,6 +63,19 @@ resource "aws_subnet" "subnet_2" {
   }
 }
 
+# 추후 필요 시 추가
+# resource "aws_subnet" "subnet_3" {
+#   vpc_id                  = aws_vpc.vpc_1.id
+#   cidr_block              = "10.0.3.0/24"
+#   availability_zone       = "${var.region}c"
+#   map_public_ip_on_launch = true
+#
+#   tags = {
+#     Name = "${local.name}-subnet-3"
+#     Team = var.team_tag
+#   }
+# }
+
 resource "aws_internet_gateway" "igw_1" {
   vpc_id = aws_vpc.vpc_1.id
 
@@ -96,6 +109,15 @@ resource "aws_route_table_association" "association_2" {
   route_table_id = aws_route_table.rt_1.id
 }
 
+# 추후 필요시 추가
+# resource "aws_route_table_association" "association_3" {
+#   subnet_id      = aws_subnet.subnet_3.id
+#   route_table_id = aws_route_table.rt_1.id
+# }
+#DB 서브넷 넣으면 ssh로 접근해서관리해야함
+# 9090, 3300,
+# 3300
+
 resource "aws_security_group" "sg_1" {
   name = "${local.name}-security-group"
 
@@ -120,13 +142,6 @@ resource "aws_security_group" "sg_1" {
   ingress {
     from_port   = 8080
     to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 8090
-    to_port     = 8090
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -261,50 +276,6 @@ docker run -d \
   -v /dockerProjects/npm_1/volumes/data:/data \
   -v /dockerProjects/npm_1/volumes/etc/letsencrypt:/etc/letsencrypt \
   jc21/nginx-proxy-manager:latest
-
-# haproxy 설치 (블루-그린 무중단 배포)
-mkdir -p /dockerProjects/ha_proxy_1/volumes/usr/local/etc/haproxy
-
-cat > /dockerProjects/ha_proxy_1/volumes/usr/local/etc/haproxy/haproxy.cfg <<'EOF'
-global
-    log stdout format raw local0
-    maxconn 4096
-
-resolvers docker
-    nameserver dns 127.0.0.11:53
-    resolve_retries 3
-    timeout retry 1s
-    hold valid 10s
-
-defaults
-    mode http
-    timeout connect 5s
-    timeout client 60s
-    timeout server 60s
-
-frontend http_front
-    bind *:80
-    acl host_api hdr(host) -i api.waitfair.shop
-    use_backend app_backend if host_api
-
-backend app_backend
-    option httpchk GET /actuator/health
-    http-check expect status 200
-    default-server init-addr none resolvers docker
-
-    server blue  app1:8080      check
-    server green app1_temp:8080 check disabled
-~
-EOF
-
-docker run -d \
-  --name ha_proxy_1 \
-  --restart unless-stopped \
-  --network common \
-  -p 8090:80 \
-  -e TZ=Asia/Seoul \
-  -v /dockerProjects/ha_proxy_1/volumes/usr/local/etc/haproxy:/usr/local/etc/haproxy \
-  haproxy:2.9-alpine
 
 
 # redis 설치
