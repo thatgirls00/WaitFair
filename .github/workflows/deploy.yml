@@ -176,7 +176,7 @@ jobs:
             # HAProxy backend 전환
             sed -i "s/use_backend .*/use_backend $TARGET_BACKEND if host_api/" $HAPROXY_CFG
             docker kill -s HUP ha_proxy_1
-            echo "✅ HAProxy switched to $TARGET_BACKEND"
+            echo "HAProxy switched to $TARGET_BACKEND"
 
             # 안정화 대기
             sleep 20
