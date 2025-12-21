@@ -119,71 +119,73 @@ jobs:
             set -e
 
             IMAGE="ghcr.io/${{ needs.buildImageAndPush.outputs.owner_lc }}/${{ needs.buildImageAndPush.outputs.image_name }}:latest"
-            HAPROXY_CFG="/usr/local/etc/haproxy/haproxy.cfg"
+            SOCKET="/var/run/haproxy.sock"
 
             echo "=== Blue-Green Deploy Start ==="
 
-            # 현재 활성 backend 확인
-            CURRENT_BACKEND=$(docker exec ha_proxy_1 grep "use_backend" $HAPROXY_CFG | awk '{print $2}')
-            echo "Current backend: $CURRENT_BACKEND"
+            # 현재 활성 server 확인
+            ACTIVE=$(docker exec ha_proxy_1 \
+              sh -c "echo 'show servers state app_backend' | socat stdio $SOCKET" \
+              | grep RUNNING | awk '{print $2}')
 
-            if [ "$CURRENT_BACKEND" = "blue_backend" ]; then
-              NEW_CONTAINER="app1_temp"
-              OLD_CONTAINER="app1"
-              TARGET_BACKEND="green_backend"
+            if [ "$ACTIVE" = "blue" ]; then
+              NEW="app1_temp"
+              NEW_SERVER="green"
+              OLD="app1"
+              OLD_SERVER="blue"
             else
-              NEW_CONTAINER="app1"
-              OLD_CONTAINER="app1_temp"
-              TARGET_BACKEND="blue_backend"
+              NEW="app1"
+              NEW_SERVER="blue"
+              OLD="app1_temp"
+              OLD_SERVER="green"
             fi
 
-            echo "New container: $NEW_CONTAINER"
-            echo "Old container: $OLD_CONTAINER"
-            echo "Target backend: $TARGET_BACKEND"
+            echo "Active server: $OLD_SERVER"
+            echo "New server: $NEW_SERVER"
 
             # 이미지 pull
             docker pull $IMAGE
 
             # 신규 컨테이너 정리
-            docker stop $NEW_CONTAINER 2>/dev/null || true
-            docker rm $NEW_CONTAINER 2>/dev/null || true
+            docker stop $NEW 2>/dev/null || true
+            docker rm   $NEW 2>/dev/null || true
 
             # 신규 컨테이너 실행
             docker run -d \
-              --name $NEW_CONTAINER \
+              --name $NEW \
               --network common \
               -e DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN }} \
               $IMAGE
 
-            # Health check (최대 60초)
+            # Health check
             for i in {1..30}; do
-              if docker exec $NEW_CONTAINER curl -fs http://localhost:8080/actuator/health > /dev/null; then
+              if docker exec $NEW curl -fs http://localhost:8080/actuator/health > /dev/null; then
                 echo "✅ Health check passed"
                 break
               fi
 
               if [ "$i" -eq 30 ]; then
                 echo "❌ Health check failed"
-                docker logs $NEW_CONTAINER
-                docker stop $NEW_CONTAINER
-                docker rm $NEW_CONTAINER
+                docker logs $NEW
                 exit 1
               fi
-
               sleep 2
             done
 
-            # HAProxy backend 전환
-            sed -i "s/use_backend .*/use_backend $TARGET_BACKEND if host_api/" $HAPROXY_CFG
-            docker kill -s HUP ha_proxy_1
-            echo "HAProxy switched to $TARGET_BACKEND"
+            # 트래픽 전환 (무중단 핵심)
+            docker exec ha_proxy_1 sh -c "
+            echo 'enable server app_backend/$NEW_SERVER'  | socat stdio $SOCKET
+            echo 'disable server app_backend/$OLD_SERVER' | socat stdio $SOCKET
+            "
 
-            # 안정화 대기
+            echo "✅ Traffic switched: $OLD_SERVER → $NEW_SERVER"
+
+            # 안정화
             sleep 20
 
             # 이전 컨테이너 정리
-            docker stop $OLD_CONTAINER 2>/dev/null || true
-            docker rm $OLD_CONTAINER 2>/dev/null || true
+            docker stop $OLD 2>/dev/null || true
+            docker rm   $OLD 2>/dev/null || true
 
             docker image prune -f
 
