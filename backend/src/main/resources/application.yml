@@ -162,3 +162,8 @@ cloud:
 google:
   captcha:
     secret-key: ${RECAPTCHA_SECRET_KEY}
+
+# TossPayments
+toss:
+  payments:
+    secret: ${TOSS_SECRET_KEY}
