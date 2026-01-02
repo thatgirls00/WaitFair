@@ -194,6 +194,12 @@ public class TicketService {
 		return ticket;
 	}
 
+	@Transactional(readOnly = true)
+	public Ticket findById(Long ticketId) {
+		return ticketRepository.findById(ticketId)
+			.orElseThrow(() -> new ErrorException(TicketErrorCode.TICKET_NOT_FOUND));
+	}
+
 	/**
 	 * Draft만료 전용 스케줄러 사용하는 메소드
 	 */
